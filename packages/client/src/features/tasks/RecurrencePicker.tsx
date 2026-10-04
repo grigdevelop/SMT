@@ -220,7 +220,7 @@ export function RecurrencePicker({ value, onChange, currentDate }: RecurrencePic
           id="recurrence-frequency-select"
           value={value ? value.frequency : 'none'}
           onChange={handleFrequencyChange}
-          className="px-2.5 py-1 text-xs rounded border border-slate-200 bg-white text-slate-800 shadow-2xs focus:ring-1 focus:ring-indigo-500 focus:outline-hidden"
+          className="px-2.5 py-1.5 sm:py-1 text-base sm:text-xs rounded border border-slate-200 bg-white text-slate-800 shadow-2xs focus:ring-1 focus:ring-indigo-500 focus:outline-hidden"
         >
           <option value="none">Does not repeat</option>
           <option value={RecurrenceFrequency.DAILY}>Daily</option>
@@ -249,7 +249,7 @@ export function RecurrencePicker({ value, onChange, currentDate }: RecurrencePic
             max={365}
             value={value.interval ?? 1}
             onChange={handleDailyIntervalChange}
-            className="w-14 px-1.5 py-0.5 text-xs text-center rounded border border-slate-200 bg-white focus:ring-1 focus:ring-indigo-500 focus:outline-hidden"
+            className="w-14 px-1.5 py-1 sm:py-0.5 text-base sm:text-xs text-center rounded border border-slate-200 bg-white focus:ring-1 focus:ring-indigo-500 focus:outline-hidden"
           />
           <span>day(s)</span>
         </div>
@@ -259,7 +259,7 @@ export function RecurrencePicker({ value, onChange, currentDate }: RecurrencePic
       {value?.frequency === RecurrenceFrequency.WEEKLY && (
         <div className="pt-1.5 border-t border-slate-200/60 space-y-1">
           <div className="text-2xs text-slate-600 font-medium">Repeat on:</div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center flex-wrap gap-1 sm:gap-1.5">
             {WEEKDAYS.map((day) => {
               const isSelected = value.daysOfWeek?.includes(day.id) ?? false;
               return (
@@ -302,7 +302,7 @@ export function RecurrencePicker({ value, onChange, currentDate }: RecurrencePic
                   aria-pressed={isSelected}
                   aria-label={`Day ${dayNum}`}
                   onClick={() => handleToggleMonthDay(dayNum)}
-                  className={`w-6 h-6 text-2xs rounded border flex items-center justify-center transition cursor-pointer ${
+                  className={`w-7 h-7 sm:w-6 sm:h-6 text-xs sm:text-2xs rounded border flex items-center justify-center transition cursor-pointer ${
                     isSelected
                       ? 'bg-indigo-600 text-white border-indigo-600 font-bold shadow-2xs'
                       : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
@@ -328,7 +328,7 @@ export function RecurrencePicker({ value, onChange, currentDate }: RecurrencePic
           <select
             value={selectedMonth}
             onChange={handleYearlyMonthChange}
-            className="px-2 py-0.5 text-xs rounded border border-slate-200 bg-white text-slate-800 shadow-2xs focus:ring-1 focus:ring-indigo-500 focus:outline-hidden"
+            className="px-2 py-1 sm:py-0.5 text-base sm:text-xs rounded border border-slate-200 bg-white text-slate-800 shadow-2xs focus:ring-1 focus:ring-indigo-500 focus:outline-hidden"
           >
             {MONTHS.map((m) => (
               <option key={m.id} value={m.id}>
@@ -339,7 +339,7 @@ export function RecurrencePicker({ value, onChange, currentDate }: RecurrencePic
           <select
             value={value.yearlyDate?.day ?? 1}
             onChange={handleYearlyDayChange}
-            className="px-2 py-0.5 text-xs rounded border border-slate-200 bg-white text-slate-800 shadow-2xs focus:ring-1 focus:ring-indigo-500 focus:outline-hidden"
+            className="px-2 py-1 sm:py-0.5 text-base sm:text-xs rounded border border-slate-200 bg-white text-slate-800 shadow-2xs focus:ring-1 focus:ring-indigo-500 focus:outline-hidden"
           >
             {Array.from({ length: maxYearlyDays }, (_, i) => i + 1).map((dayNum) => (
               <option key={dayNum} value={dayNum}>
@@ -352,7 +352,7 @@ export function RecurrencePicker({ value, onChange, currentDate }: RecurrencePic
 
       {/* Recurrence Horizon: Starts On & Ends On */}
       {value && (
-        <div className="pt-2 border-t border-slate-200/60 flex flex-wrap gap-4 text-2xs text-slate-700">
+        <div className="pt-2 border-t border-slate-200/60 flex flex-col sm:flex-row sm:flex-wrap gap-2.5 sm:gap-4 text-2xs text-slate-700">
           {/* Starts on */}
           <div className="flex flex-col gap-1">
             <label
@@ -368,13 +368,13 @@ export function RecurrencePicker({ value, onChange, currentDate }: RecurrencePic
                 type="date"
                 value={value.startDate ?? (currentDate || '')}
                 onChange={handleStartDateChange}
-                className="px-2 py-0.5 text-xs rounded border border-slate-200 bg-white text-slate-800 shadow-2xs focus:ring-1 focus:ring-indigo-500 focus:outline-hidden"
+                className="px-2 py-1 sm:py-0.5 text-base sm:text-xs rounded border border-slate-200 bg-white text-slate-800 shadow-2xs focus:ring-1 focus:ring-indigo-500 focus:outline-hidden"
               />
               {currentDate && (
                 <button
                   type="button"
                   onClick={() => onChange({ ...value, startDate: currentDate })}
-                  className="text-2xs px-1.5 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium cursor-pointer"
+                  className="text-2xs px-2 py-1 sm:py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium cursor-pointer"
                 >
                   Today
                 </button>
@@ -397,13 +397,13 @@ export function RecurrencePicker({ value, onChange, currentDate }: RecurrencePic
                 type="date"
                 value={value.endDate ?? ''}
                 onChange={handleEndDateChange}
-                className="px-2 py-0.5 text-xs rounded border border-slate-200 bg-white text-slate-800 shadow-2xs focus:ring-1 focus:ring-indigo-500 focus:outline-hidden"
+                className="px-2 py-1 sm:py-0.5 text-base sm:text-xs rounded border border-slate-200 bg-white text-slate-800 shadow-2xs focus:ring-1 focus:ring-indigo-500 focus:outline-hidden"
               />
               {value.endDate && (
                 <button
                   type="button"
                   onClick={() => onChange({ ...value, endDate: null })}
-                  className="text-2xs px-1.5 py-0.5 rounded hover:bg-rose-50 text-rose-600 font-medium cursor-pointer"
+                  className="text-2xs px-2 py-1 sm:py-0.5 rounded hover:bg-rose-50 text-rose-600 font-medium cursor-pointer"
                   title="Clear end date"
                 >
                   Never

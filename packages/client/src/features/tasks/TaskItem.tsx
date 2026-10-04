@@ -103,7 +103,7 @@ export function TaskItem({ task, currentDate, onToggle, onDelete, onUpdate }: Ta
               type="button"
               onClick={handleToggleClick}
               aria-label={task.isCompleted ? 'Mark incomplete' : 'Mark complete'}
-              className={`w-5 h-5 rounded border flex items-center justify-center transition-colors cursor-pointer shrink-0 ${
+              className={`w-6 h-6 sm:w-5 sm:h-5 rounded border flex items-center justify-center transition-colors cursor-pointer shrink-0 ${
                 task.isCompleted
                   ? 'bg-emerald-500 border-emerald-500 text-white'
                   : 'border-slate-300 hover:border-slate-400 bg-white'
@@ -230,13 +230,13 @@ export function TaskItem({ task, currentDate, onToggle, onDelete, onUpdate }: Ta
         </div>
 
         {/* Action buttons (Edit & Delete) */}
-        <div className="flex items-center gap-1 ml-2 shrink-0">
+        <div className="flex items-center gap-0.5 sm:gap-1 ml-1 sm:ml-2 shrink-0">
           <button
             type="button"
             onClick={() => setIsEditing(true)}
             aria-label="Edit task"
             title="Edit task"
-            className="opacity-0 group-hover:opacity-100 focus:opacity-100 text-slate-400 hover:text-indigo-600 p-1.5 rounded transition cursor-pointer"
+            className="text-slate-400 hover:text-indigo-600 sm:opacity-0 sm:group-hover:opacity-100 focus:opacity-100 p-1.5 rounded transition cursor-pointer"
           >
             <Pencil className="w-3.5 h-3.5" />
           </button>
@@ -245,7 +245,7 @@ export function TaskItem({ task, currentDate, onToggle, onDelete, onUpdate }: Ta
             onClick={() => onDelete(task.id)}
             aria-label="Delete task"
             title="Delete task"
-            className="opacity-0 group-hover:opacity-100 focus:opacity-100 text-slate-400 hover:text-red-500 p-1.5 rounded transition cursor-pointer"
+            className="text-slate-400 hover:text-rose-500 sm:opacity-0 sm:group-hover:opacity-100 focus:opacity-100 p-1.5 rounded transition cursor-pointer"
           >
             <Trash2 className="w-3.5 h-3.5" />
           </button>

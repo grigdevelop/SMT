@@ -36,15 +36,15 @@ export function MarkdownToolbar({
   };
 
   return (
-    <div className="flex items-center justify-between pb-1.5 border-b border-slate-100 text-xs">
-      {/* Left: Quick Formatting Buttons */}
-      <div className="flex items-center gap-0.5">
+    <div className="flex items-center justify-between gap-2 pb-1.5 border-b border-slate-100 text-xs">
+      {/* Left: Quick Formatting Buttons (horizontally scrollable on narrow mobile screens) */}
+      <div className="flex items-center gap-0.5 overflow-x-auto py-0.5">
         <button
           type="button"
           onClick={() => applyFormat('**', '**', 'bold text')}
           title="Bold (**text**)"
           disabled={mode === 'preview'}
-          className="p-1 rounded hover:bg-slate-100 disabled:opacity-30 text-slate-600 hover:text-slate-900 transition cursor-pointer"
+          className="p-1 rounded hover:bg-slate-100 disabled:opacity-30 text-slate-600 hover:text-slate-900 transition cursor-pointer shrink-0"
         >
           <Bold className="w-3.5 h-3.5" />
         </button>
@@ -53,7 +53,7 @@ export function MarkdownToolbar({
           onClick={() => applyFormat('*', '*', 'italic text')}
           title="Italic (*text*)"
           disabled={mode === 'preview'}
-          className="p-1 rounded hover:bg-slate-100 disabled:opacity-30 text-slate-600 hover:text-slate-900 transition cursor-pointer"
+          className="p-1 rounded hover:bg-slate-100 disabled:opacity-30 text-slate-600 hover:text-slate-900 transition cursor-pointer shrink-0"
         >
           <Italic className="w-3.5 h-3.5" />
         </button>
@@ -62,7 +62,7 @@ export function MarkdownToolbar({
           onClick={() => applyFormat('- ', '', 'list item')}
           title="Bullet List (- item)"
           disabled={mode === 'preview'}
-          className="p-1 rounded hover:bg-slate-100 disabled:opacity-30 text-slate-600 hover:text-slate-900 transition cursor-pointer"
+          className="p-1 rounded hover:bg-slate-100 disabled:opacity-30 text-slate-600 hover:text-slate-900 transition cursor-pointer shrink-0"
         >
           <List className="w-3.5 h-3.5" />
         </button>
@@ -71,7 +71,7 @@ export function MarkdownToolbar({
           onClick={() => applyFormat('`', '`', 'code')}
           title="Inline Code (`code`)"
           disabled={mode === 'preview'}
-          className="p-1 rounded hover:bg-slate-100 disabled:opacity-30 text-slate-600 hover:text-slate-900 transition cursor-pointer"
+          className="p-1 rounded hover:bg-slate-100 disabled:opacity-30 text-slate-600 hover:text-slate-900 transition cursor-pointer shrink-0"
         >
           <Code className="w-3.5 h-3.5" />
         </button>
@@ -80,14 +80,14 @@ export function MarkdownToolbar({
           onClick={() => applyFormat('[', '](https://)', 'link title')}
           title="Link ([title](url))"
           disabled={mode === 'preview'}
-          className="p-1 rounded hover:bg-slate-100 disabled:opacity-30 text-slate-600 hover:text-slate-900 transition cursor-pointer"
+          className="p-1 rounded hover:bg-slate-100 disabled:opacity-30 text-slate-600 hover:text-slate-900 transition cursor-pointer shrink-0"
         >
           <LinkIcon className="w-3.5 h-3.5" />
         </button>
       </div>
 
       {/* Right: Write / Preview Tab Switch */}
-      <div className="flex items-center bg-slate-100 rounded p-0.5 text-2xs font-medium">
+      <div className="flex items-center bg-slate-100 rounded p-0.5 text-2xs font-medium shrink-0">
         <button
           type="button"
           onClick={() => onModeChange('write')}

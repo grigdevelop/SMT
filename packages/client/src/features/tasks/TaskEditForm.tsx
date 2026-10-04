@@ -103,7 +103,7 @@ export function TaskEditForm({
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Task title..."
-          className="w-full px-3 py-2 rounded-md border border-slate-300 bg-white text-sm text-slate-900 font-medium placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+          className="w-full px-3 py-2 rounded-md border border-slate-300 bg-white text-base sm:text-sm text-slate-900 font-medium placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
         />
         {isTitleEmpty && (
           <p className="text-2xs text-rose-600 mt-1 font-medium">Title cannot be empty</p>
@@ -136,7 +136,7 @@ export function TaskEditForm({
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Add detailed notes, checklists (- item), or links ([text](url))..."
             maxLength={5000}
-            className="w-full p-2 rounded border border-slate-200 bg-white text-xs text-slate-800 placeholder-slate-400 font-mono focus:outline-hidden focus:ring-1 focus:ring-indigo-500 focus:border-transparent resize-y"
+            className="w-full p-2 rounded border border-slate-200 bg-white text-base sm:text-xs text-slate-800 placeholder-slate-400 font-mono focus:outline-hidden focus:ring-1 focus:ring-indigo-500 focus:border-transparent resize-y"
           />
         ) : (
           <div className="min-h-[72px] p-2.5 rounded border border-slate-200 bg-white">
@@ -151,7 +151,7 @@ export function TaskEditForm({
 
       {/* Single-Task Date Controls (Hidden when Repeating) */}
       {!recurrenceRule && (
-        <div className="pt-2 border-t border-slate-100 flex flex-wrap gap-4 text-xs">
+        <div className="pt-2 border-t border-slate-100 flex flex-col sm:flex-row sm:flex-wrap gap-2.5 sm:gap-4 text-xs">
           {/* Todo Date (Execution Day) */}
           <div className="flex flex-col gap-1">
             <label
@@ -167,7 +167,7 @@ export function TaskEditForm({
                 type="date"
                 value={todoDate}
                 onChange={(e) => setTodoDate(e.target.value)}
-                className="px-2 py-1 rounded border border-slate-200 bg-white font-mono text-slate-700 text-xs shadow-2xs focus:ring-1 focus:ring-indigo-500 focus:outline-hidden"
+                className="px-2 py-1 rounded border border-slate-200 bg-white font-mono text-slate-700 text-base sm:text-xs shadow-2xs focus:ring-1 focus:ring-indigo-500 focus:outline-hidden"
               />
               <button
                 type="button"
@@ -211,7 +211,7 @@ export function TaskEditForm({
                 type="date"
                 value={deadline}
                 onChange={(e) => setDeadline(e.target.value)}
-                className="px-2 py-1 rounded border border-slate-200 bg-white font-mono text-slate-700 text-xs shadow-2xs focus:ring-1 focus:ring-rose-500 focus:outline-hidden"
+                className="px-2 py-1 rounded border border-slate-200 bg-white font-mono text-slate-700 text-base sm:text-xs shadow-2xs focus:ring-1 focus:ring-rose-500 focus:outline-hidden"
               />
               {deadline && (
                 <button

@@ -119,7 +119,7 @@ export function SkillSelector({ selectedSkillIds, onChange, maxSkills = 10 }: Sk
               type="button"
               onClick={() => handleRemove(skill.id)}
               aria-label={`Remove skill ${skill.name}`}
-              className="hover:opacity-75 cursor-pointer ml-0.5"
+              className="p-1 -m-1 inline-flex items-center justify-center hover:opacity-75 cursor-pointer ml-0.5"
             >
               <X className="w-2.5 h-2.5" />
             </button>
@@ -142,7 +142,7 @@ export function SkillSelector({ selectedSkillIds, onChange, maxSkills = 10 }: Sk
                   ? 'Tag skills (e.g. Math, Coding)...'
                   : 'Add another skill...'
               }
-              className="w-full text-2xs px-1 py-0.5 text-slate-800 placeholder-slate-400 focus:outline-hidden bg-transparent"
+              className="w-full text-base sm:text-2xs px-1 py-0.5 text-slate-800 placeholder-slate-400 focus:outline-hidden bg-transparent"
             />
           </div>
         )}
@@ -169,7 +169,7 @@ export function SkillSelector({ selectedSkillIds, onChange, maxSkills = 10 }: Sk
                 key={skill.id}
                 type="button"
                 onClick={() => handleSelect(skill.id)}
-                className="w-full px-3 py-1.5 text-left flex items-center justify-between hover:bg-slate-50 transition cursor-pointer"
+                className="w-full px-3 py-2 sm:py-1.5 text-left flex items-center justify-between hover:bg-slate-50 transition cursor-pointer"
               >
                 <div className="flex items-center gap-2">
                   <span
@@ -189,7 +189,7 @@ export function SkillSelector({ selectedSkillIds, onChange, maxSkills = 10 }: Sk
                 type="button"
                 onClick={handleCreate}
                 disabled={createSkill.isPending}
-                className="w-full px-3 py-1.5 text-left border-t border-slate-100 flex items-center gap-2 hover:bg-indigo-50 text-indigo-700 transition cursor-pointer font-medium text-2xs"
+                className="w-full px-3 py-2 sm:py-1.5 text-left border-t border-slate-100 flex items-center gap-2 hover:bg-indigo-50 text-indigo-700 transition cursor-pointer font-medium text-xs sm:text-2xs"
               >
                 <Plus className="w-3.5 h-3.5 shrink-0" />
                 <span>Create skill "{query.trim()}"</span>

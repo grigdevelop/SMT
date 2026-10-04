@@ -217,17 +217,17 @@ export function SkillsPage() {
               placeholder="Skill name (e.g. Mathematics, TypeScript, Writing)..."
               autoFocus
               maxLength={100}
-              className="flex-1 px-3 py-2 rounded-lg border border-slate-200 bg-slate-50 text-xs text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:bg-white"
+              className="flex-1 px-3 py-2 rounded-lg border border-slate-200 bg-slate-50 text-base sm:text-xs text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:bg-white"
             />
 
             {/* Color Palette Picker */}
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center flex-wrap gap-1.5 sm:gap-2">
               {SKILL_COLOR_PALETTE.map((color) => (
                 <button
                   key={color}
                   type="button"
                   onClick={() => setNewSkillColor(color)}
-                  className={`w-6 h-6 rounded-full transition transform cursor-pointer ${
+                  className={`w-6 h-6 rounded-full transition transform cursor-pointer shrink-0 ${
                     newSkillColor === color
                       ? 'ring-2 ring-offset-2 ring-indigo-500 scale-110'
                       : 'hover:opacity-80'
@@ -308,17 +308,17 @@ export function SkillsPage() {
                     value={editName}
                     onChange={(e) => setEditName(e.target.value)}
                     maxLength={100}
-                    className="w-full px-3 py-1.5 rounded-lg border border-slate-200 text-xs text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-1.5 rounded-lg border border-slate-200 text-base sm:text-xs text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
                   />
 
                   {/* Color Palette */}
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center flex-wrap gap-1.5 sm:gap-2">
                     {SKILL_COLOR_PALETTE.map((color) => (
                       <button
                         key={color}
                         type="button"
                         onClick={() => setEditColor(color)}
-                        className={`w-5 h-5 rounded-full transition transform cursor-pointer ${
+                        className={`w-5 h-5 rounded-full transition transform cursor-pointer shrink-0 ${
                           editColor === color
                             ? 'ring-2 ring-offset-2 ring-indigo-500 scale-110'
                             : 'hover:opacity-80'
@@ -382,7 +382,7 @@ export function SkillsPage() {
                       type="button"
                       onClick={() => handleStartEdit(skill)}
                       aria-label={`Edit ${skill.name}`}
-                      className="opacity-0 group-hover:opacity-100 p-1 text-slate-400 hover:text-indigo-600 rounded transition cursor-pointer"
+                      className="text-slate-400 hover:text-indigo-600 sm:opacity-0 sm:group-hover:opacity-100 focus:opacity-100 p-1.5 rounded transition cursor-pointer"
                     >
                       <Pencil className="w-3.5 h-3.5" />
                     </button>
@@ -390,7 +390,7 @@ export function SkillsPage() {
                       type="button"
                       onClick={() => handleDelete(skill.id, skill.name)}
                       aria-label={`Delete ${skill.name}`}
-                      className="opacity-0 group-hover:opacity-100 p-1 text-slate-400 hover:text-rose-600 rounded transition cursor-pointer"
+                      className="text-slate-400 hover:text-rose-600 sm:opacity-0 sm:group-hover:opacity-100 focus:opacity-100 p-1.5 rounded transition cursor-pointer"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>

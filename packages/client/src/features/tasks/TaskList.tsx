@@ -78,20 +78,20 @@ export function TaskList() {
         onSubmit={handleSubmit}
         className="space-y-3 bg-white p-4 rounded-xl border border-slate-200 shadow-xs"
       >
-        <div className="flex gap-2">
+        <div className="flex gap-1.5 sm:gap-2">
           <input
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="What do you need to do today?"
-            className="flex-1 px-4 py-2.5 rounded-lg border border-slate-200 bg-slate-50/50 shadow-2xs focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:bg-white text-slate-800 placeholder-slate-400 text-sm transition"
+            className="flex-1 min-w-0 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg border border-slate-200 bg-slate-50/50 shadow-2xs focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:bg-white text-slate-800 placeholder-slate-400 text-base sm:text-sm transition"
             autoFocus
           />
           <button
             type="button"
             onClick={() => setShowDetails(!showDetails)}
             title="Set execution date, deadline, or notes"
-            className={`px-3 py-2.5 border rounded-lg text-xs font-medium flex items-center gap-1.5 transition cursor-pointer ${
+            className={`px-2.5 sm:px-3 py-2 sm:py-2.5 border rounded-lg text-xs font-medium flex items-center gap-1 sm:gap-1.5 transition cursor-pointer shrink-0 ${
               showDetails ||
               todoDate ||
               deadline ||
@@ -103,15 +103,15 @@ export function TaskList() {
             }`}
           >
             <Calendar className="w-4 h-4" />
-            <span className="hidden sm:inline">Details</span>
+            <span className="hidden xs:inline">Details</span>
           </button>
           <button
             type="submit"
             disabled={!title.trim() || createTask.isPending}
-            className="inline-flex items-center px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-lg text-sm font-medium shadow-2xs transition cursor-pointer"
+            className="inline-flex items-center px-3 sm:px-4 py-2 sm:py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-lg text-xs sm:text-sm font-semibold shadow-2xs transition cursor-pointer shrink-0"
           >
-            <Plus className="w-4 h-4 mr-1" />
-            Add
+            <Plus className="w-4 h-4 sm:mr-1" />
+            <span className="hidden xs:inline">Add</span>
           </button>
         </div>
 
@@ -134,41 +134,43 @@ export function TaskList() {
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Optional detailed steps (- item), links, or code notes..."
                 maxLength={5000}
-                className="w-full p-2 rounded border border-slate-200 bg-slate-50/50 text-xs text-slate-800 placeholder-slate-400 font-mono focus:outline-hidden focus:ring-1 focus:ring-indigo-500 focus:bg-white resize-y"
+                className="w-full p-2 rounded border border-slate-200 bg-slate-50/50 text-base sm:text-xs text-slate-800 placeholder-slate-400 font-mono focus:outline-hidden focus:ring-1 focus:ring-indigo-500 focus:bg-white resize-y"
               />
             </div>
 
             {/* Single-Task Date Pickers (Hidden when Repeating) */}
             {!recurrenceRule && (
-              <div className="flex flex-wrap gap-4">
-                <div className="flex items-center gap-2">
+              <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2.5 sm:gap-4">
+                <div className="flex items-center justify-between sm:justify-start gap-2">
                   <label
                     htmlFor="todo-date-input"
-                    className="text-slate-600 font-medium flex items-center gap-1"
+                    className="text-slate-600 font-medium flex items-center gap-1 shrink-0"
                   >
                     <CalendarDays className="w-3.5 h-3.5 text-indigo-600" />
-                    <span>Todo Date (Execution):</span>
+                    <span>Todo Date:</span>
                   </label>
-                  <input
-                    id="todo-date-input"
-                    type="date"
-                    value={todoDate}
-                    onChange={(e) => setTodoDate(e.target.value)}
-                    className="px-2 py-1 rounded border border-slate-200 bg-white font-mono text-slate-700 text-xs shadow-2xs focus:ring-1 focus:ring-indigo-500 focus:outline-hidden"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setTodoDate(currentDate)}
-                    className="text-2xs text-indigo-600 hover:underline cursor-pointer"
-                  >
-                    Today
-                  </button>
+                  <div className="flex items-center gap-1.5">
+                    <input
+                      id="todo-date-input"
+                      type="date"
+                      value={todoDate}
+                      onChange={(e) => setTodoDate(e.target.value)}
+                      className="px-2 py-1 rounded border border-slate-200 bg-white font-mono text-slate-700 text-base sm:text-xs shadow-2xs focus:ring-1 focus:ring-indigo-500 focus:outline-hidden"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setTodoDate(currentDate)}
+                      className="text-2xs text-indigo-600 hover:underline cursor-pointer"
+                    >
+                      Today
+                    </button>
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center justify-between sm:justify-start gap-2">
                   <label
                     htmlFor="deadline-input"
-                    className="text-slate-600 font-medium flex items-center gap-1"
+                    className="text-slate-600 font-medium flex items-center gap-1 shrink-0"
                   >
                     <Clock className="w-3.5 h-3.5 text-rose-600" />
                     <span>Deadline:</span>
@@ -178,7 +180,7 @@ export function TaskList() {
                     type="date"
                     value={deadline}
                     onChange={(e) => setDeadline(e.target.value)}
-                    className="px-2 py-1 rounded border border-slate-200 bg-white font-mono text-slate-700 text-xs shadow-2xs focus:ring-1 focus:ring-rose-500 focus:outline-hidden"
+                    className="px-2 py-1 rounded border border-slate-200 bg-white font-mono text-slate-700 text-base sm:text-xs shadow-2xs focus:ring-1 focus:ring-rose-500 focus:outline-hidden"
                   />
                 </div>
               </div>

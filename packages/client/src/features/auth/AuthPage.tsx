@@ -72,7 +72,7 @@ export function AuthPage({ mode }: AuthPageProps) {
 
       {/* Main Card */}
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-6 shadow-sm border border-slate-200 rounded-xl sm:px-10">
+        <div className="bg-white py-8 px-4 sm:px-10 shadow-sm border border-slate-200 rounded-xl">
           {/* Server Error Alert Banner */}
           {serverError && (
             <div
@@ -99,7 +99,7 @@ export function AuthPage({ mode }: AuthPageProps) {
                 autoComplete="email"
                 placeholder="you@example.com"
                 {...formRegister('email')}
-                className={`block w-full px-3.5 py-2.5 text-sm rounded-lg border transition shadow-xs outline-hidden focus:ring-2 ${
+                className={`block w-full px-3.5 py-2.5 text-base sm:text-sm rounded-lg border transition shadow-xs outline-hidden focus:ring-2 ${
                   errors.email
                     ? 'border-rose-300 focus:border-rose-500 focus:ring-rose-200 text-rose-900'
                     : 'border-slate-300 focus:border-indigo-600 focus:ring-indigo-100 text-slate-900'
@@ -131,7 +131,7 @@ export function AuthPage({ mode }: AuthPageProps) {
                   autoComplete={isLogin ? 'current-password' : 'new-password'}
                   placeholder="••••••••"
                   {...formRegister('password')}
-                  className={`block w-full px-3.5 py-2.5 pr-10 text-sm rounded-lg border transition shadow-xs outline-hidden focus:ring-2 ${
+                  className={`block w-full px-3.5 py-2.5 pr-10 text-base sm:text-sm rounded-lg border transition shadow-xs outline-hidden focus:ring-2 ${
                     errors.password
                       ? 'border-rose-300 focus:border-rose-500 focus:ring-rose-200 text-rose-900'
                       : 'border-slate-300 focus:border-indigo-600 focus:ring-indigo-100 text-slate-900'
