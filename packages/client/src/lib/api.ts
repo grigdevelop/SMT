@@ -6,6 +6,9 @@ import type {
   LoginDto,
   AuthResponseDto,
   UserDto,
+  SkillDto,
+  CreateSkillDto,
+  UpdateSkillDto,
 } from '@self/contracts';
 
 const BASE_URL = import.meta.env.VITE_API_URL || '/api';
@@ -129,6 +132,50 @@ export const api = {
         headers: getHeaders(),
       });
       if (!res.ok) throw new Error('Failed to delete task');
+    },
+  },
+
+  skills: {
+    async list(): Promise<SkillDto[]> {
+      const res = await fetch(`${BASE_URL}/skills`, {
+        headers: getHeaders(),
+      });
+      if (!res.ok) throw new Error('Failed to fetch skills');
+      return res.json();
+    },
+
+    async create(dto: CreateSkillDto): Promise<SkillDto> {
+      const res = await fetch(`${BASE_URL}/skills`, {
+        method: 'POST',
+        headers: getHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify(dto),
+      });
+      if (!res.ok) {
+        const error = await res.json().catch(() => ({}));
+        throw new Error(error.message || 'Failed to create skill');
+      }
+      return res.json();
+    },
+
+    async update(id: string, dto: UpdateSkillDto): Promise<SkillDto> {
+      const res = await fetch(`${BASE_URL}/skills/${id}`, {
+        method: 'PATCH',
+        headers: getHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify(dto),
+      });
+      if (!res.ok) {
+        const error = await res.json().catch(() => ({}));
+        throw new Error(error.message || 'Failed to update skill');
+      }
+      return res.json();
+    },
+
+    async delete(id: string): Promise<void> {
+      const res = await fetch(`${BASE_URL}/skills/${id}`, {
+        method: 'DELETE',
+        headers: getHeaders(),
+      });
+      if (!res.ok) throw new Error('Failed to delete skill');
     },
   },
 };

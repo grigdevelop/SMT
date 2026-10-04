@@ -15,6 +15,7 @@ import {
   ChevronDown,
   ChevronUp,
   RotateCw,
+  Sparkles,
 } from 'lucide-react';
 
 export interface TaskItemProps {
@@ -28,6 +29,7 @@ export interface TaskItemProps {
 export function TaskItem({ task, currentDate, onToggle, onDelete, onUpdate }: TaskItemProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isNotesExpanded, setIsNotesExpanded] = useState(false);
+  const [rewardVisible, setRewardVisible] = useState(false);
 
   const status = getTaskStatus(task, currentDate);
   const isUpcoming = status === TaskStatus.UPCOMING;
@@ -48,9 +50,18 @@ export function TaskItem({ task, currentDate, onToggle, onDelete, onUpdate }: Ta
     );
   }
 
+  const handleToggleClick = () => {
+    const nextCompleted = !task.isCompleted;
+    if (nextCompleted && task.skills && task.skills.length > 0) {
+      setRewardVisible(true);
+      setTimeout(() => setRewardVisible(false), 2000);
+    }
+    onToggle(task.id, nextCompleted);
+  };
+
   return (
     <div
-      className={`p-3.5 rounded-lg border transition group ${
+      className={`relative p-3.5 rounded-lg border transition group ${
         task.isCompleted
           ? 'border-slate-100 bg-slate-50/50'
           : isOverdue
@@ -60,6 +71,21 @@ export function TaskItem({ task, currentDate, onToggle, onDelete, onUpdate }: Ta
               : 'border-slate-200 bg-white hover:border-slate-300'
       }`}
     >
+      {/* Floating Micro-Reward Feedback Pill */}
+      {rewardVisible && task.skills && task.skills.length > 0 && (
+        <div
+          data-testid="micro-reward-pill"
+          className="absolute right-4 -top-3.5 z-20 flex items-center gap-1.5 shadow-md bg-white border border-indigo-200 px-2.5 py-1 rounded-full text-xs font-semibold animate-bounce pointer-events-none"
+        >
+          <Sparkles className="w-3.5 h-3.5 text-indigo-500" />
+          {task.skills.map((s) => (
+            <span key={s.id} style={{ color: s.color }}>
+              +1 #{s.name}
+            </span>
+          ))}
+        </div>
+      )}
+
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3 flex-1 min-w-0">
           {/* Completion Toggle button or Locked signifier */}
@@ -75,7 +101,7 @@ export function TaskItem({ task, currentDate, onToggle, onDelete, onUpdate }: Ta
           ) : (
             <button
               type="button"
-              onClick={() => onToggle(task.id, !task.isCompleted)}
+              onClick={handleToggleClick}
               aria-label={task.isCompleted ? 'Mark incomplete' : 'Mark complete'}
               className={`w-5 h-5 rounded border flex items-center justify-center transition-colors cursor-pointer shrink-0 ${
                 task.isCompleted
@@ -152,6 +178,31 @@ export function TaskItem({ task, currentDate, onToggle, onDelete, onUpdate }: Ta
                   <RotateCw className="w-3 h-3 text-indigo-500" />
                   <span>{formatRecurrenceLabel(task.recurrenceRule)}</span>
                 </span>
+              )}
+
+              {/* Associated Skill Badges */}
+              {task.skills && task.skills.length > 0 && (
+                <div className="flex items-center flex-wrap gap-1">
+                  {task.skills.map((skill) => (
+                    <span
+                      key={skill.id}
+                      data-testid={`skill-badge-${skill.name.toLowerCase()}`}
+                      className="inline-flex items-center gap-1 text-2xs px-1.5 py-0.5 rounded font-medium border"
+                      style={{
+                        backgroundColor: `${skill.color}15`,
+                        color: skill.color,
+                        borderColor: `${skill.color}35`,
+                      }}
+                      title={`Cultivates skill: ${skill.name}`}
+                    >
+                      <span
+                        className="w-1.5 h-1.5 rounded-full shrink-0"
+                        style={{ backgroundColor: skill.color }}
+                      />
+                      <span>#{skill.name}</span>
+                    </span>
+                  ))}
+                </div>
               )}
 
               {/* Collapsible Notes Pill */}

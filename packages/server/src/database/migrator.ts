@@ -6,6 +6,7 @@ import * as migration002 from './migrations/002_create_users_and_api_tokens';
 import * as migration003 from './migrations/003_add_user_id_to_tasks';
 import * as migration004 from './migrations/004_add_deadline_and_todo_date_to_tasks';
 import * as migration005 from './migrations/005_add_recurrence_to_tasks';
+import * as migration006 from './migrations/006_create_skills';
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ export const migrations: Record<string, Migration> = {
   '003_add_user_id_to_tasks': migration003,
   '004_add_deadline_and_todo_date_to_tasks': migration004,
   '005_add_recurrence_to_tasks': migration005,
+  '006_create_skills': migration006,
 };
 
 export class MemoryMigrationProvider implements MigrationProvider {

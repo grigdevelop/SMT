@@ -5,6 +5,7 @@ import { parseLocalDate, formatLocalDate } from '../../lib/date-context';
 import { MarkdownToolbar } from '../../components/MarkdownToolbar';
 import { MarkdownViewer } from '../../components/MarkdownViewer';
 import { RecurrencePicker } from './RecurrencePicker';
+import { SkillSelector } from '../skills/SkillSelector';
 
 export interface TaskEditFormProps {
   task: TaskDto;
@@ -28,6 +29,9 @@ export function TaskEditForm({
   const [deadline, setDeadline] = useState(task.deadline ? task.deadline.slice(0, 10) : '');
   const [recurrenceRule, setRecurrenceRule] = useState<RecurrenceRule | null>(
     task.recurrenceRule ?? null,
+  );
+  const [skillIds, setSkillIds] = useState<string[]>(
+    task.skills ? task.skills.map((s) => s.id) : [],
   );
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -62,6 +66,7 @@ export function TaskEditForm({
           : null,
       deadline: recurrenceRule ? null : deadline ? `${deadline}T23:59:59.000Z` : null,
       recurrenceRule: recurrenceRule ?? null,
+      skillIds: skillIds,
     };
 
     onSave(dto);
@@ -229,6 +234,9 @@ export function TaskEditForm({
         onChange={setRecurrenceRule}
         currentDate={currentDate}
       />
+
+      {/* Cultivated Skills Selector */}
+      <SkillSelector selectedSkillIds={skillIds} onChange={setSkillIds} />
 
       {/* Action Buttons */}
       <div className="pt-2 border-t border-slate-100 flex items-center justify-end gap-2">

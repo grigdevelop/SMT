@@ -1,12 +1,17 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, NavLink } from 'react-router-dom';
 import { TaskList } from './features/tasks/TaskList';
+import { SkillsPage } from './features/skills/SkillsPage';
 import { AuthPage } from './features/auth/AuthPage';
 import { ProtectedRoute } from './features/auth/ProtectedRoute';
 import { useAuth } from './features/auth/AuthContext';
 import { CheckSquare, LogOut, User as UserIcon } from 'lucide-react';
 import { DevTimeMachine } from './components/DevTimeMachine';
 
-function Dashboard() {
+interface DashboardProps {
+  view: 'tasks' | 'skills';
+}
+
+function Dashboard({ view }: DashboardProps) {
   const { user, logout } = useAuth();
 
   return (
@@ -27,14 +32,36 @@ function Dashboard() {
 
           {/* Navigation & User Profile */}
           <div className="flex items-center space-x-4">
-            <nav className="flex items-center space-x-3 text-xs font-medium text-slate-500">
-              <span className="text-indigo-600 font-semibold bg-indigo-50 px-2.5 py-1 rounded-md">
+            <nav className="flex items-center space-x-1.5 text-xs font-medium text-slate-500">
+              <NavLink
+                to="/"
+                end
+                className={({ isActive }) =>
+                  `px-2.5 py-1 rounded-md transition ${
+                    isActive
+                      ? 'text-indigo-600 font-semibold bg-indigo-50'
+                      : 'hover:text-slate-900 hover:bg-slate-100'
+                  }`
+                }
+              >
                 Today
-              </span>
-              <span className="cursor-not-allowed opacity-50" title="Coming soon">
+              </NavLink>
+              <NavLink
+                to="/skills"
+                className={({ isActive }) =>
+                  `px-2.5 py-1 rounded-md transition ${
+                    isActive
+                      ? 'text-indigo-600 font-semibold bg-indigo-50'
+                      : 'hover:text-slate-900 hover:bg-slate-100'
+                  }`
+                }
+              >
+                Skills
+              </NavLink>
+              <span className="cursor-not-allowed opacity-50 px-2 py-1" title="Coming soon">
                 Habits
               </span>
-              <span className="cursor-not-allowed opacity-50" title="Coming soon">
+              <span className="cursor-not-allowed opacity-50 px-2 py-1" title="Coming soon">
                 Goals
               </span>
             </nav>
@@ -66,14 +93,19 @@ function Dashboard() {
 
       {/* Main Content Area */}
       <main className="flex-1 max-w-4xl w-full mx-auto px-4 py-8">
-        <div className="mb-6 max-w-xl mx-auto text-left">
-          <h1 className="text-xl font-bold text-slate-900 tracking-tight">Today's Tasks</h1>
-          <p className="text-xs text-slate-500 mt-1">
-            Focus on what matters most today. Instant updates, zero friction.
-          </p>
-        </div>
-
-        <TaskList />
+        {view === 'tasks' ? (
+          <>
+            <div className="mb-6 max-w-xl mx-auto text-left">
+              <h1 className="text-xl font-bold text-slate-900 tracking-tight">Today's Tasks</h1>
+              <p className="text-xs text-slate-500 mt-1">
+                Focus on what matters most today. Instant updates, zero friction.
+              </p>
+            </div>
+            <TaskList />
+          </>
+        ) : (
+          <SkillsPage />
+        )}
       </main>
     </div>
   );
@@ -88,7 +120,15 @@ export function App() {
         path="/"
         element={
           <ProtectedRoute>
-            <Dashboard />
+            <Dashboard view="tasks" />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/skills"
+        element={
+          <ProtectedRoute>
+            <Dashboard view="skills" />
           </ProtectedRoute>
         }
       />

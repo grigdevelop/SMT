@@ -20,6 +20,7 @@ export function useCreateTask() {
     mutationFn: (dto: CreateTaskDto) => api.tasks.create(dto),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: taskKeys.all });
+      queryClient.invalidateQueries({ queryKey: ['skills'] });
     },
   });
 }
@@ -47,6 +48,7 @@ export function useUpdateTask() {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: taskKeys.all });
+      queryClient.invalidateQueries({ queryKey: ['skills'] });
     },
   });
 }
@@ -75,6 +77,7 @@ export function useToggleTask() {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: taskKeys.all });
+      queryClient.invalidateQueries({ queryKey: ['skills'] });
     },
   });
 }
@@ -86,6 +89,7 @@ export function useDeleteTask() {
     mutationFn: (id: string) => api.tasks.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: taskKeys.all });
+      queryClient.invalidateQueries({ queryKey: ['skills'] });
     },
   });
 }

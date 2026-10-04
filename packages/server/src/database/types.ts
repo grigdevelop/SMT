@@ -34,8 +34,24 @@ export interface ApiTokenTable {
   created_at: Generated<string>;
 }
 
+export interface SkillTable {
+  id: Generated<string>;
+  user_id: string;
+  name: string;
+  color: Generated<string>;
+  created_at: Generated<string>;
+  updated_at: Generated<string>;
+}
+
+export interface TaskSkillTable {
+  task_id: string;
+  skill_id: string;
+}
+
 export interface Database {
   tasks: TaskTable;
   users: UserTable;
   api_tokens: ApiTokenTable;
+  skills: SkillTable;
+  task_skills: TaskSkillTable;
 }

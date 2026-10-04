@@ -1,4 +1,8 @@
 import { z } from 'zod';
+import type { SkillSummaryDto } from '../skills/skill.contract';
+
+/** A task may develop at most 10 skills; duplicates are rejected client- and server-side. */
+const SkillIdsSchema = z.array(z.string().uuid()).max(10, 'A task can have at most 10 skills');
 
 export const TaskStatus = {
   UPCOMING: 'UPCOMING',
@@ -58,6 +62,7 @@ export const CreateTaskSchema = z.object({
   deadline: z.string().datetime().nullable().optional(),
   dueDate: z.string().datetime().optional(), // Kept for backwards compatibility
   recurrenceRule: RecurrenceRuleSchema.nullable().optional(),
+  skillIds: SkillIdsSchema.optional(),
 });
 export type CreateTaskDto = z.infer<typeof CreateTaskSchema>;
 
@@ -73,6 +78,8 @@ export const UpdateTaskSchema = z.object({
   deadline: z.string().datetime().nullable().optional(),
   dueDate: z.string().datetime().nullable().optional(),
   recurrenceRule: RecurrenceRuleSchema.nullable().optional(),
+  /** When provided, fully replaces the task's skill set. Omit to leave skills untouched. */
+  skillIds: SkillIdsSchema.optional(),
 });
 export type UpdateTaskDto = z.infer<typeof UpdateTaskSchema>;
 
@@ -86,6 +93,7 @@ export interface TaskDto {
   readonly dueDate?: string | null;
   readonly recurrenceRule?: RecurrenceRule | null;
   readonly parentTaskId?: string | null;
+  readonly skills?: readonly SkillSummaryDto[];
   readonly createdAt: string;
   readonly updatedAt: string;
 }

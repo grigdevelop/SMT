@@ -6,12 +6,15 @@ import { TaskItem } from './TaskItem';
 import { RecurrencePicker } from './RecurrencePicker';
 import { Plus, Loader2, Calendar, Clock, CalendarDays, FileText } from 'lucide-react';
 
+import { SkillSelector } from '../skills/SkillSelector';
+
 export function TaskList() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [todoDate, setTodoDate] = useState('');
   const [deadline, setDeadline] = useState('');
   const [recurrenceRule, setRecurrenceRule] = useState<RecurrenceRule | null>(null);
+  const [skillIds, setSkillIds] = useState<string[]>([]);
   const [showDetails, setShowDetails] = useState(false);
 
   const { currentDate } = useCurrentDate();
@@ -33,6 +36,7 @@ export function TaskList() {
         todoDate: recurrenceRule ? undefined : todoDate || undefined,
         deadline: recurrenceRule ? undefined : deadline ? `${deadline}T23:59:59.000Z` : undefined,
         recurrenceRule: recurrenceRule || undefined,
+        skillIds: skillIds.length > 0 ? skillIds : undefined,
       },
       {
         onSuccess: () => {
@@ -41,6 +45,7 @@ export function TaskList() {
           setTodoDate('');
           setDeadline('');
           setRecurrenceRule(null);
+          setSkillIds([]);
           setShowDetails(false);
         },
       },
@@ -87,7 +92,12 @@ export function TaskList() {
             onClick={() => setShowDetails(!showDetails)}
             title="Set execution date, deadline, or notes"
             className={`px-3 py-2.5 border rounded-lg text-xs font-medium flex items-center gap-1.5 transition cursor-pointer ${
-              showDetails || todoDate || deadline || description || recurrenceRule
+              showDetails ||
+              todoDate ||
+              deadline ||
+              description ||
+              recurrenceRule ||
+              skillIds.length > 0
                 ? 'bg-indigo-50 border-indigo-200 text-indigo-700'
                 : 'border-slate-200 hover:bg-slate-50 text-slate-600'
             }`}
@@ -180,6 +190,9 @@ export function TaskList() {
               onChange={setRecurrenceRule}
               currentDate={currentDate}
             />
+
+            {/* Cultivated Skills Selector */}
+            <SkillSelector selectedSkillIds={skillIds} onChange={setSkillIds} />
           </div>
         )}
       </form>

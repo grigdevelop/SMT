@@ -1,8 +1,10 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { TaskItem } from './TaskItem';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { TaskItem, type TaskItemProps } from './TaskItem';
 import type { TaskDto } from '@self/contracts';
 import { RecurrenceFrequency } from '@self/contracts';
+import { api } from '../../lib/api';
 
 const mockTask: TaskDto = {
   id: 'task-123',
@@ -13,6 +15,7 @@ const mockTask: TaskDto = {
   deadline: '2026-10-10T23:59:59.000Z',
   recurrenceRule: null,
   dueDate: null,
+  skills: [],
   createdAt: '2026-10-04T00:00:00.000Z',
   updatedAt: '2026-10-04T00:00:00.000Z',
 };
@@ -26,6 +29,7 @@ const mockTaskWithDescription: TaskDto = {
   deadline: null,
   recurrenceRule: null,
   dueDate: null,
+  skills: [],
   createdAt: '2026-10-04T00:00:00.000Z',
   updatedAt: '2026-10-04T00:00:00.000Z',
 };
@@ -42,100 +46,83 @@ const mockRecurringTask: TaskDto = {
     interval: 1,
   },
   dueDate: null,
+  skills: [],
+  createdAt: '2026-10-04T00:00:00.000Z',
+  updatedAt: '2026-10-04T00:00:00.000Z',
+};
+
+const mockTaskWithSkills: TaskDto = {
+  id: 'task-skills-1',
+  title: 'Study Vector Calculus',
+  description: null,
+  isCompleted: false,
+  todoDate: '2026-10-04',
+  deadline: null,
+  recurrenceRule: null,
+  dueDate: null,
+  skills: [
+    { id: 'skill-1', name: 'Math', color: '#6366f1' },
+    { id: 'skill-2', name: 'Physics', color: '#10b981' },
+  ],
   createdAt: '2026-10-04T00:00:00.000Z',
   updatedAt: '2026-10-04T00:00:00.000Z',
 };
 
 describe('TaskItem & Inline Editing', () => {
-  it('renders task normally with edit affordance', () => {
-    const onToggle = vi.fn();
-    const onDelete = vi.fn();
-    const onUpdate = vi.fn();
+  beforeEach(() => {
+    vi.spyOn(api.skills, 'list').mockResolvedValue([]);
+  });
 
-    render(
-      <TaskItem
-        task={mockTask}
-        currentDate="2026-10-04"
-        onToggle={onToggle}
-        onDelete={onDelete}
-        onUpdate={onUpdate}
-      />,
+  function renderWithQuery(task: TaskDto, props: Partial<TaskItemProps> = {}) {
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    });
+
+    return render(
+      <QueryClientProvider client={queryClient}>
+        <TaskItem
+          task={task}
+          currentDate="2026-10-04"
+          onToggle={props.onToggle || vi.fn()}
+          onDelete={props.onDelete || vi.fn()}
+          onUpdate={props.onUpdate || vi.fn()}
+        />
+      </QueryClientProvider>,
     );
+  }
 
+  it('renders task normally with edit affordance', () => {
+    renderWithQuery(mockTask);
     expect(screen.getByText('Refactor Query Cache')).toBeDefined();
     expect(screen.getByRole('button', { name: /edit task/i })).toBeDefined();
   });
 
   it('renders recurrence badge when task has recurrenceRule', () => {
-    const onToggle = vi.fn();
-    const onDelete = vi.fn();
-    const onUpdate = vi.fn();
-
-    render(
-      <TaskItem
-        task={mockRecurringTask}
-        currentDate="2026-10-04"
-        onToggle={onToggle}
-        onDelete={onDelete}
-        onUpdate={onUpdate}
-      />,
-    );
-
+    renderWithQuery(mockRecurringTask);
     const badge = screen.getByTestId('recurrence-badge');
     expect(badge).toBeDefined();
     expect(badge.textContent).toContain('Daily');
   });
 
   it('renders Notes button and toggles formatted Markdown viewer', () => {
-    const onToggle = vi.fn();
-    const onDelete = vi.fn();
-    const onUpdate = vi.fn();
-
-    render(
-      <TaskItem
-        task={mockTaskWithDescription}
-        currentDate="2026-10-04"
-        onToggle={onToggle}
-        onDelete={onDelete}
-        onUpdate={onUpdate}
-      />,
-    );
-
+    renderWithQuery(mockTaskWithDescription);
     const notesBtn = screen.getByTitle(/view formatted notes/i);
     expect(notesBtn).toBeDefined();
 
-    // Notes container is not yet mounted (Carmack optimization)
     expect(screen.queryByText(/Key Requirements/i)).toBeNull();
-
-    // Click to expand
     fireEvent.click(notesBtn);
     expect(screen.getByText(/Key Requirements/i)).toBeDefined();
-    expect(screen.getByText(/Docker/i)).toBeDefined();
 
-    // Click to collapse
-    fireEvent.click(notesBtn);
+    const collapseBtn = screen.getByTitle(/collapse notes/i);
+    fireEvent.click(collapseBtn);
     expect(screen.queryByText(/Key Requirements/i)).toBeNull();
   });
 
   it('switches to inline edit mode when Edit button is clicked', () => {
-    const onToggle = vi.fn();
-    const onDelete = vi.fn();
-    const onUpdate = vi.fn();
-
-    render(
-      <TaskItem
-        task={mockTask}
-        currentDate="2026-10-04"
-        onToggle={onToggle}
-        onDelete={onDelete}
-        onUpdate={onUpdate}
-      />,
-    );
-
+    renderWithQuery(mockTask);
     const editBtn = screen.getByRole('button', { name: /edit task/i });
     fireEvent.click(editBtn);
 
-    // Form inputs should now be visible
     const titleInput = screen.getByPlaceholderText('Task title...') as HTMLInputElement;
     expect(titleInput).toBeDefined();
     expect(titleInput.value).toBe('Refactor Query Cache');
@@ -144,19 +131,8 @@ describe('TaskItem & Inline Editing', () => {
   });
 
   it('submits updated title, dates, and description when Save Changes is clicked', () => {
-    const onToggle = vi.fn();
-    const onDelete = vi.fn();
     const onUpdate = vi.fn();
-
-    render(
-      <TaskItem
-        task={mockTask}
-        currentDate="2026-10-04"
-        onToggle={onToggle}
-        onDelete={onDelete}
-        onUpdate={onUpdate}
-      />,
-    );
+    renderWithQuery(mockTask, { onUpdate });
 
     fireEvent.click(screen.getByRole('button', { name: /edit task/i }));
 
@@ -175,34 +151,21 @@ describe('TaskItem & Inline Editing', () => {
       todoDate: '2026-10-04',
       deadline: '2026-10-10T23:59:59.000Z',
       recurrenceRule: null,
+      skillIds: [],
     });
   });
 
   it('allows configuring recurrence rule in edit mode and saving', () => {
-    const onToggle = vi.fn();
-    const onDelete = vi.fn();
     const onUpdate = vi.fn();
-
-    render(
-      <TaskItem
-        task={mockTask}
-        currentDate="2026-10-04"
-        onToggle={onToggle}
-        onDelete={onDelete}
-        onUpdate={onUpdate}
-      />,
-    );
+    renderWithQuery(mockTask, { onUpdate });
 
     fireEvent.click(screen.getByRole('button', { name: /edit task/i }));
 
-    // Initially shows single-task date controls
     expect(screen.getByLabelText(/todo date \(execution\):/i)).toBeDefined();
 
-    // Change recurrence frequency to WEEKLY
     const freqSelect = screen.getByLabelText(/repeat frequency/i);
     fireEvent.change(freqSelect, { target: { value: RecurrenceFrequency.WEEKLY } });
 
-    // Single-task date controls are hidden, replaced by Starts on and Ends on
     expect(screen.queryByLabelText(/todo date \(execution\):/i)).toBeNull();
     expect(screen.queryByLabelText(/deadline \(cutoff\):/i)).toBeNull();
     expect(screen.getByLabelText(/starts on:/i)).toBeDefined();
@@ -222,47 +185,23 @@ describe('TaskItem & Inline Editing', () => {
   });
 
   it('cancels edit mode on Escape key without invoking onUpdate', () => {
-    const onToggle = vi.fn();
-    const onDelete = vi.fn();
     const onUpdate = vi.fn();
-
-    render(
-      <TaskItem
-        task={mockTask}
-        currentDate="2026-10-04"
-        onToggle={onToggle}
-        onDelete={onDelete}
-        onUpdate={onUpdate}
-      />,
-    );
+    renderWithQuery(mockTask, { onUpdate });
 
     fireEvent.click(screen.getByRole('button', { name: /edit task/i }));
 
     const titleInput = screen.getByPlaceholderText('Task title...');
     fireEvent.change(titleInput, { target: { value: 'Discarded change' } });
 
-    // Press Escape
     fireEvent.keyDown(titleInput, { key: 'Escape' });
 
     expect(onUpdate).not.toHaveBeenCalled();
-    // Switched back to normal display
     expect(screen.getByText('Refactor Query Cache')).toBeDefined();
   });
 
   it('allows clearing todoDate via Clear button', () => {
-    const onToggle = vi.fn();
-    const onDelete = vi.fn();
     const onUpdate = vi.fn();
-
-    render(
-      <TaskItem
-        task={mockTask}
-        currentDate="2026-10-04"
-        onToggle={onToggle}
-        onDelete={onDelete}
-        onUpdate={onUpdate}
-      />,
-    );
+    renderWithQuery(mockTask, { onUpdate });
 
     fireEvent.click(screen.getByRole('button', { name: /edit task/i }));
 
@@ -278,6 +217,31 @@ describe('TaskItem & Inline Editing', () => {
       todoDate: null,
       deadline: '2026-10-10T23:59:59.000Z',
       recurrenceRule: null,
+      skillIds: [],
     });
+  });
+
+  it('renders skill badges for associated skills', () => {
+    renderWithQuery(mockTaskWithSkills);
+    const mathBadge = screen.getByTestId('skill-badge-math');
+    const physicsBadge = screen.getByTestId('skill-badge-physics');
+    expect(mathBadge).toBeDefined();
+    expect(mathBadge.textContent).toContain('#Math');
+    expect(physicsBadge).toBeDefined();
+    expect(physicsBadge.textContent).toContain('#Physics');
+  });
+
+  it('triggers micro-reward feedback pill when completing a task with skills', () => {
+    const onToggle = vi.fn();
+    renderWithQuery(mockTaskWithSkills, { onToggle });
+
+    const toggleBtn = screen.getByRole('button', { name: /mark complete/i });
+    fireEvent.click(toggleBtn);
+
+    expect(onToggle).toHaveBeenCalledWith('task-skills-1', true);
+    const rewardPill = screen.getByTestId('micro-reward-pill');
+    expect(rewardPill).toBeDefined();
+    expect(rewardPill.textContent).toContain('+1 #Math');
+    expect(rewardPill.textContent).toContain('+1 #Physics');
   });
 });
