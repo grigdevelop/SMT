@@ -8,7 +8,7 @@ import type {
   UserDto,
 } from '@self/contracts';
 
-const BASE_URL = '/api';
+const BASE_URL = import.meta.env.VITE_API_URL || '/api';
 const TOKEN_KEY = 'smt_access_token';
 
 export const tokenStorage = {
