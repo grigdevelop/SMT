@@ -9,44 +9,54 @@ import {
   HttpCode,
   HttpStatus,
   Inject,
+  UseGuards,
 } from '@nestjs/common';
 import { CreateTaskSchema, UpdateTaskSchema } from '@self/contracts';
 import type { CreateTaskDto, UpdateTaskDto, TaskDto } from '@self/contracts';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
+import { AuthGuard } from '../auth/guards/auth.guard';
+import type { AuthenticatedUser } from '../auth/guards/auth.guard';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { TasksService } from './tasks.service';
 
 @Controller('tasks')
+@UseGuards(AuthGuard)
 export class TasksController {
   constructor(@Inject(TasksService) private readonly tasksService: TasksService) {}
 
   @Get()
-  async findAll(): Promise<TaskDto[]> {
-    return this.tasksService.findAll();
+  async findAll(@CurrentUser() user: AuthenticatedUser): Promise<TaskDto[]> {
+    return this.tasksService.findAll(user.id);
   }
 
   @Get(':id')
-  async findById(@Param('id') id: string): Promise<TaskDto> {
-    return this.tasksService.findById(id);
+  async findById(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') id: string,
+  ): Promise<TaskDto> {
+    return this.tasksService.findById(id, user.id);
   }
 
   @Post()
   async create(
+    @CurrentUser() user: AuthenticatedUser,
     @Body(new ZodValidationPipe(CreateTaskSchema)) dto: CreateTaskDto,
   ): Promise<TaskDto> {
-    return this.tasksService.create(dto);
+    return this.tasksService.create(user.id, dto);
   }
 
   @Patch(':id')
   async update(
+    @CurrentUser() user: AuthenticatedUser,
     @Param('id') id: string,
     @Body(new ZodValidationPipe(UpdateTaskSchema)) dto: UpdateTaskDto,
   ): Promise<TaskDto> {
-    return this.tasksService.update(id, dto);
+    return this.tasksService.update(id, user.id, dto);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async delete(@Param('id') id: string): Promise<void> {
-    await this.tasksService.delete(id);
+  async delete(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string): Promise<void> {
+    await this.tasksService.delete(id, user.id);
   }
 }

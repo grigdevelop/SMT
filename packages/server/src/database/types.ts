@@ -2,6 +2,7 @@ import { Generated } from 'kysely';
 
 export interface TaskTable {
   id: Generated<string>;
+  user_id: string;
   title: string;
   description: string | null;
   is_completed: Generated<boolean>;

@@ -8,21 +8,21 @@ import { TasksRepository } from './tasks.repository';
 export class TasksService {
   constructor(@Inject(TasksRepository) private readonly repository: TasksRepository) {}
 
-  async findAll(): Promise<TaskDto[]> {
-    const rows = await this.repository.findAll();
+  async findAll(userId: string): Promise<TaskDto[]> {
+    const rows = await this.repository.findAll(userId);
     return rows.map((row) => this.toDto(row));
   }
 
-  async findById(id: string): Promise<TaskDto> {
-    const row = await this.repository.findById(id);
+  async findById(id: string, userId: string): Promise<TaskDto> {
+    const row = await this.repository.findById(id, userId);
     if (!row) {
       throw new NotFoundException(`Task with ID "${id}" not found`);
     }
     return this.toDto(row);
   }
 
-  async create(dto: CreateTaskDto): Promise<TaskDto> {
-    const row = await this.repository.create({
+  async create(userId: string, dto: CreateTaskDto): Promise<TaskDto> {
+    const row = await this.repository.create(userId, {
       title: dto.title,
       description: dto.description,
       due_date: dto.dueDate,
@@ -30,8 +30,8 @@ export class TasksService {
     return this.toDto(row);
   }
 
-  async update(id: string, dto: UpdateTaskDto): Promise<TaskDto> {
-    const row = await this.repository.update(id, {
+  async update(id: string, userId: string, dto: UpdateTaskDto): Promise<TaskDto> {
+    const row = await this.repository.update(id, userId, {
       title: dto.title,
       description: dto.description,
       is_completed: dto.isCompleted,
@@ -43,8 +43,8 @@ export class TasksService {
     return this.toDto(row);
   }
 
-  async delete(id: string): Promise<void> {
-    const deleted = await this.repository.delete(id);
+  async delete(id: string, userId: string): Promise<void> {
+    const deleted = await this.repository.delete(id, userId);
     if (!deleted) {
       throw new NotFoundException(`Task with ID "${id}" not found`);
     }
