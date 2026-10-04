@@ -4,6 +4,7 @@ import {
   UpdateTaskDto,
   TaskDto,
   calculateNextTodoDate,
+  calculateInitialTodoDate,
   RecurrenceRule,
 } from '@self/contracts';
 import { Selectable } from 'kysely';
@@ -50,13 +51,24 @@ export class TasksService {
     return this.toDto(row);
   }
 
-  async create(userId: string, dto: CreateTaskDto): Promise<TaskDto> {
+  async create(userId: string, dto: CreateTaskDto, simulatedDate?: string): Promise<TaskDto> {
+    const today =
+      simulatedDate && /^\d{4}-\d{2}-\d{2}$/.test(simulatedDate)
+        ? simulatedDate
+        : new Date().toISOString().slice(0, 10);
+
+    let todoDate = dto.todoDate ?? null;
+    if (dto.recurrenceRule && !todoDate) {
+      todoDate = calculateInitialTodoDate(dto.recurrenceRule, today);
+    }
+
     const row = await this.repository.create(userId, {
       title: dto.title,
       description: dto.description,
-      todo_date: dto.todoDate ?? null,
-      deadline: dto.deadline ?? dto.dueDate ?? null,
-      due_date: dto.dueDate ?? dto.deadline ?? null,
+      todo_date: todoDate,
+      // Recurring tasks use horizon start/end dates instead of static deadlines
+      deadline: dto.recurrenceRule ? null : (dto.deadline ?? dto.dueDate ?? null),
+      due_date: dto.recurrenceRule ? null : (dto.dueDate ?? dto.deadline ?? null),
       recurrence_rule: dto.recurrenceRule ?? null,
     });
     return this.toDto(row);
@@ -98,13 +110,16 @@ export class TasksService {
       if (rule) {
         const nextTodoDate = calculateNextTodoDate(rule, today);
 
-        await this.repository.create(userId, {
-          title: existing.title,
-          description: existing.description,
-          todo_date: nextTodoDate,
-          recurrence_rule: rule,
-          parent_task_id: existing.parent_task_id || existing.id,
-        });
+        // Only materialize if within boundary (not past endDate)
+        if (nextTodoDate) {
+          await this.repository.create(userId, {
+            title: existing.title,
+            description: existing.description,
+            todo_date: nextTodoDate,
+            recurrence_rule: rule,
+            parent_task_id: existing.parent_task_id || existing.id,
+          });
+        }
       }
     }
 

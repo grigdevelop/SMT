@@ -42,8 +42,9 @@ export class TasksController {
   async create(
     @CurrentUser() user: AuthenticatedUser,
     @Body(new ZodValidationPipe(CreateTaskSchema)) dto: CreateTaskDto,
+    @Headers('x-simulated-date') simulatedDate?: string,
   ): Promise<TaskDto> {
-    return this.tasksService.create(user.id, dto);
+    return this.tasksService.create(user.id, dto, simulatedDate);
   }
 
   @Patch(':id')

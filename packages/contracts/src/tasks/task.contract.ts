@@ -27,6 +27,15 @@ export const RecurrenceRuleSchema = z.object({
       day: z.number().int().min(1).max(31),
     })
     .optional(),
+  startDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
+  endDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .nullable()
+    .optional(),
 });
 export type RecurrenceRule = z.infer<typeof RecurrenceRuleSchema>;
 
@@ -115,13 +124,104 @@ export function getTaskStatus(
 }
 
 /**
+ * Pure calculation function that determines the initial civil todo_date (YYYY-MM-DD)
+ * for a recurring task based on its schedule and reference date.
+ */
+export function calculateInitialTodoDate(rule: RecurrenceRule, referenceDateStr: string): string {
+  const effectiveStart =
+    rule.startDate && rule.startDate > referenceDateStr ? rule.startDate : referenceDateStr;
+
+  const [startYear, startMonth, startDay] = effectiveStart.split('-').map(Number);
+  const baseDate = new Date(startYear, startMonth - 1, startDay);
+
+  const formatOutput = (d: Date): string => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  };
+
+  const getDaysInMonth = (year: number, month: number): number => {
+    return new Date(year, month, 0).getDate();
+  };
+
+  if (rule.frequency === RecurrenceFrequency.DAILY) {
+    return effectiveStart;
+  }
+
+  if (rule.frequency === RecurrenceFrequency.WEEKLY) {
+    const allowedDays =
+      rule.daysOfWeek && rule.daysOfWeek.length > 0
+        ? [...rule.daysOfWeek].sort((a, b) => a - b)
+        : [baseDate.getDay()];
+
+    const candidate = new Date(baseDate);
+    for (let i = 0; i <= 14; i++) {
+      if (allowedDays.includes(candidate.getDay())) {
+        return formatOutput(candidate);
+      }
+      candidate.setDate(candidate.getDate() + 1);
+    }
+    return effectiveStart;
+  }
+
+  if (rule.frequency === RecurrenceFrequency.MONTHLY) {
+    const allowedDays =
+      rule.daysOfMonth && rule.daysOfMonth.length > 0
+        ? [...rule.daysOfMonth].sort((a, b) => a - b)
+        : [startDay];
+
+    const currentMaxDays = getDaysInMonth(startYear, startMonth);
+    const validDayThisMonth = allowedDays.find((d) => d >= startDay);
+
+    if (validDayThisMonth) {
+      const clampedDay = Math.min(validDayThisMonth, currentMaxDays);
+      return `${startYear}-${String(startMonth).padStart(2, '0')}-${String(clampedDay).padStart(2, '0')}`;
+    }
+
+    // Move to next month
+    let nextYear = startYear;
+    let nextMonth = startMonth + 1;
+    if (nextMonth > 12) {
+      nextMonth = 1;
+      nextYear += 1;
+    }
+    const nextMaxDays = getDaysInMonth(nextYear, nextMonth);
+    const clampedDay = Math.min(allowedDays[0], nextMaxDays);
+    return `${nextYear}-${String(nextMonth).padStart(2, '0')}-${String(clampedDay).padStart(2, '0')}`;
+  }
+
+  if (rule.frequency === RecurrenceFrequency.YEARLY) {
+    const targetMonth = rule.yearlyDate?.month ?? startMonth;
+    const targetDay = rule.yearlyDate?.day ?? startDay;
+
+    let candidateYear = startYear;
+    let maxDaysInCandidate = getDaysInMonth(candidateYear, targetMonth);
+    let clampedCandidateDay = Math.min(targetDay, maxDaysInCandidate);
+    const candidateStr = `${candidateYear}-${String(targetMonth).padStart(2, '0')}-${String(clampedCandidateDay).padStart(2, '0')}`;
+
+    if (candidateStr >= effectiveStart) {
+      return candidateStr;
+    }
+
+    candidateYear += 1;
+    maxDaysInCandidate = getDaysInMonth(candidateYear, targetMonth);
+    clampedCandidateDay = Math.min(targetDay, maxDaysInCandidate);
+    return `${candidateYear}-${String(targetMonth).padStart(2, '0')}-${String(clampedCandidateDay).padStart(2, '0')}`;
+  }
+
+  return effectiveStart;
+}
+
+/**
  * Pure calculation function that determines the next civil todo_date (YYYY-MM-DD)
  * for a recurring task based on a reference civil date.
+ * Returns null if the recurrence has concluded (past rule.endDate).
  */
 export function calculateNextTodoDate(
   rule: RecurrenceRule,
   referenceDateStr: string, // 'YYYY-MM-DD'
-): string {
+): string | null {
   const [refYear, refMonth, refDay] = referenceDateStr.split('-').map(Number);
   const baseDate = new Date(refYear, refMonth - 1, refDay);
 
@@ -136,11 +236,18 @@ export function calculateNextTodoDate(
     return new Date(year, month, 0).getDate();
   };
 
+  const finalizeDate = (dateStr: string): string | null => {
+    if (rule.endDate && dateStr > rule.endDate) {
+      return null;
+    }
+    return dateStr;
+  };
+
   if (rule.frequency === RecurrenceFrequency.DAILY) {
     const interval = Math.max(1, rule.interval || 1);
     const nextDate = new Date(baseDate);
     nextDate.setDate(nextDate.getDate() + interval);
-    return formatOutput(nextDate);
+    return finalizeDate(formatOutput(nextDate));
   }
 
   if (rule.frequency === RecurrenceFrequency.WEEKLY) {
@@ -154,13 +261,13 @@ export function calculateNextTodoDate(
     for (let i = 1; i <= 14; i++) {
       candidate.setDate(candidate.getDate() + 1);
       if (allowedDays.includes(candidate.getDay())) {
-        return formatOutput(candidate);
+        return finalizeDate(formatOutput(candidate));
       }
     }
     // Fallback +7 days
     const fallback = new Date(baseDate);
     fallback.setDate(fallback.getDate() + 7);
-    return formatOutput(fallback);
+    return finalizeDate(formatOutput(fallback));
   }
 
   if (rule.frequency === RecurrenceFrequency.MONTHLY) {
@@ -175,7 +282,9 @@ export function calculateNextTodoDate(
 
     if (laterDayInCurrentMonth) {
       const clampedDay = Math.min(laterDayInCurrentMonth, currentMaxDays);
-      return `${refYear}-${String(refMonth).padStart(2, '0')}-${String(clampedDay).padStart(2, '0')}`;
+      return finalizeDate(
+        `${refYear}-${String(refMonth).padStart(2, '0')}-${String(clampedDay).padStart(2, '0')}`,
+      );
     }
 
     // Move to next month(s)
@@ -190,7 +299,9 @@ export function calculateNextTodoDate(
     const nextMaxDays = getDaysInMonth(nextYear, nextMonth);
     const clampedDay = Math.min(firstAllowedDay, nextMaxDays);
 
-    return `${nextYear}-${String(nextMonth).padStart(2, '0')}-${String(clampedDay).padStart(2, '0')}`;
+    return finalizeDate(
+      `${nextYear}-${String(nextMonth).padStart(2, '0')}-${String(clampedDay).padStart(2, '0')}`,
+    );
   }
 
   if (rule.frequency === RecurrenceFrequency.YEARLY) {
@@ -204,7 +315,7 @@ export function calculateNextTodoDate(
     const candidateStr = `${candidateYear}-${String(targetMonth).padStart(2, '0')}-${String(clampedCandidateDay).padStart(2, '0')}`;
 
     if (candidateStr > referenceDateStr) {
-      return candidateStr;
+      return finalizeDate(candidateStr);
     }
 
     // Advance to next year
@@ -212,13 +323,15 @@ export function calculateNextTodoDate(
     maxDaysInCandidate = getDaysInMonth(candidateYear, targetMonth);
     clampedCandidateDay = Math.min(targetDay, maxDaysInCandidate);
 
-    return `${candidateYear}-${String(targetMonth).padStart(2, '0')}-${String(clampedCandidateDay).padStart(2, '0')}`;
+    return finalizeDate(
+      `${candidateYear}-${String(targetMonth).padStart(2, '0')}-${String(clampedCandidateDay).padStart(2, '0')}`,
+    );
   }
 
   // Default fallback
   const fallbackDate = new Date(baseDate);
   fallbackDate.setDate(fallbackDate.getDate() + 1);
-  return formatOutput(fallbackDate);
+  return finalizeDate(formatOutput(fallbackDate));
 }
 
 const WEEKDAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -241,43 +354,44 @@ const MONTH_NAMES = [
  * Returns a human-friendly signifier string describing the recurrence rule.
  */
 export function formatRecurrenceLabel(rule: RecurrenceRule): string {
-  if (rule.frequency === RecurrenceFrequency.DAILY) {
-    return rule.interval && rule.interval > 1 ? `Every ${rule.interval} days` : 'Daily';
-  }
+  let label = 'Recurring';
 
-  if (rule.frequency === RecurrenceFrequency.WEEKLY) {
+  if (rule.frequency === RecurrenceFrequency.DAILY) {
+    label = rule.interval && rule.interval > 1 ? `Every ${rule.interval} days` : 'Daily';
+  } else if (rule.frequency === RecurrenceFrequency.WEEKLY) {
     if (!rule.daysOfWeek || rule.daysOfWeek.length === 0) {
-      return 'Weekly';
-    }
-    if (rule.daysOfWeek.length === 7) {
-      return 'Daily';
-    }
-    if (
+      label = 'Weekly';
+    } else if (rule.daysOfWeek.length === 7) {
+      label = 'Daily';
+    } else if (
       rule.daysOfWeek.length === 5 &&
       !rule.daysOfWeek.includes(0) &&
       !rule.daysOfWeek.includes(6)
     ) {
-      return 'Weekdays (Mon-Fri)';
+      label = 'Weekdays (Mon-Fri)';
+    } else {
+      const days = rule.daysOfWeek.map((d) => WEEKDAY_NAMES[d]).join(', ');
+      label = `Weekly: ${days}`;
     }
-    const days = rule.daysOfWeek.map((d) => WEEKDAY_NAMES[d]).join(', ');
-    return `Weekly: ${days}`;
-  }
-
-  if (rule.frequency === RecurrenceFrequency.MONTHLY) {
+  } else if (rule.frequency === RecurrenceFrequency.MONTHLY) {
     if (!rule.daysOfMonth || rule.daysOfMonth.length === 0) {
-      return 'Monthly';
+      label = 'Monthly';
+    } else {
+      const days = rule.daysOfMonth.map((d) => `${d}`).join(', ');
+      label = `Monthly: day ${days}`;
     }
-    const days = rule.daysOfMonth.map((d) => `${d}`).join(', ');
-    return `Monthly: day ${days}`;
-  }
-
-  if (rule.frequency === RecurrenceFrequency.YEARLY) {
+  } else if (rule.frequency === RecurrenceFrequency.YEARLY) {
     if (rule.yearlyDate) {
       const monthStr = MONTH_NAMES[rule.yearlyDate.month - 1];
-      return `Yearly on ${monthStr} ${rule.yearlyDate.day}`;
+      label = `Yearly on ${monthStr} ${rule.yearlyDate.day}`;
+    } else {
+      label = 'Yearly';
     }
-    return 'Yearly';
   }
 
-  return 'Recurring';
+  if (rule.endDate) {
+    label += ` (until ${rule.endDate})`;
+  }
+
+  return label;
 }

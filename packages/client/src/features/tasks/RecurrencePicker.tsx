@@ -1,6 +1,6 @@
 import React from 'react';
 import { RecurrenceFrequency, type RecurrenceRule, formatRecurrenceLabel } from '@self/contracts';
-import { RotateCw, X } from 'lucide-react';
+import { RotateCw, X, CalendarDays, Clock } from 'lucide-react';
 import { parseLocalDate } from '../../lib/date-context';
 
 export interface RecurrencePickerProps {
@@ -53,12 +53,16 @@ export function RecurrencePicker({ value, onChange, currentDate }: RecurrencePic
     }
 
     const { weekday, day, month } = getContextDateDefaults();
+    const startDate = value?.startDate ?? currentDate;
+    const endDate = value?.endDate ?? undefined;
 
     switch (freq) {
       case RecurrenceFrequency.DAILY:
         onChange({
           frequency: RecurrenceFrequency.DAILY,
           interval: value?.frequency === RecurrenceFrequency.DAILY ? (value.interval ?? 1) : 1,
+          startDate,
+          endDate,
         });
         break;
       case RecurrenceFrequency.WEEKLY:
@@ -69,6 +73,8 @@ export function RecurrencePicker({ value, onChange, currentDate }: RecurrencePic
             value?.frequency === RecurrenceFrequency.WEEKLY && value.daysOfWeek?.length
               ? value.daysOfWeek
               : [weekday],
+          startDate,
+          endDate,
         });
         break;
       case RecurrenceFrequency.MONTHLY:
@@ -79,6 +85,8 @@ export function RecurrencePicker({ value, onChange, currentDate }: RecurrencePic
             value?.frequency === RecurrenceFrequency.MONTHLY && value.daysOfMonth?.length
               ? value.daysOfMonth
               : [day],
+          startDate,
+          endDate,
         });
         break;
       case RecurrenceFrequency.YEARLY:
@@ -89,6 +97,8 @@ export function RecurrencePicker({ value, onChange, currentDate }: RecurrencePic
             month,
             day,
           },
+          startDate,
+          endDate,
         });
         break;
     }
@@ -158,6 +168,22 @@ export function RecurrencePicker({ value, onChange, currentDate }: RecurrencePic
         month: value.yearlyDate?.month ?? 1,
         day,
       },
+    });
+  };
+
+  const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!value) return;
+    onChange({
+      ...value,
+      startDate: e.target.value || undefined,
+    });
+  };
+
+  const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!value) return;
+    onChange({
+      ...value,
+      endDate: e.target.value || null,
     });
   };
 
@@ -321,6 +347,70 @@ export function RecurrencePicker({ value, onChange, currentDate }: RecurrencePic
               </option>
             ))}
           </select>
+        </div>
+      )}
+
+      {/* Recurrence Horizon: Starts On & Ends On */}
+      {value && (
+        <div className="pt-2 border-t border-slate-200/60 flex flex-wrap gap-4 text-2xs text-slate-700">
+          {/* Starts on */}
+          <div className="flex flex-col gap-1">
+            <label
+              htmlFor="recurrence-start-date"
+              className="font-medium flex items-center gap-1 text-slate-600"
+            >
+              <CalendarDays className="w-3.5 h-3.5 text-indigo-600" />
+              <span>Starts on:</span>
+            </label>
+            <div className="flex items-center gap-1.5">
+              <input
+                id="recurrence-start-date"
+                type="date"
+                value={value.startDate ?? (currentDate || '')}
+                onChange={handleStartDateChange}
+                className="px-2 py-0.5 text-xs rounded border border-slate-200 bg-white text-slate-800 shadow-2xs focus:ring-1 focus:ring-indigo-500 focus:outline-hidden"
+              />
+              {currentDate && (
+                <button
+                  type="button"
+                  onClick={() => onChange({ ...value, startDate: currentDate })}
+                  className="text-2xs px-1.5 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium cursor-pointer"
+                >
+                  Today
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Ends on */}
+          <div className="flex flex-col gap-1">
+            <label
+              htmlFor="recurrence-end-date"
+              className="font-medium flex items-center gap-1 text-slate-600"
+            >
+              <Clock className="w-3.5 h-3.5 text-slate-500" />
+              <span>Ends on (Optional):</span>
+            </label>
+            <div className="flex items-center gap-1.5">
+              <input
+                id="recurrence-end-date"
+                type="date"
+                value={value.endDate ?? ''}
+                onChange={handleEndDateChange}
+                className="px-2 py-0.5 text-xs rounded border border-slate-200 bg-white text-slate-800 shadow-2xs focus:ring-1 focus:ring-indigo-500 focus:outline-hidden"
+              />
+              {value.endDate && (
+                <button
+                  type="button"
+                  onClick={() => onChange({ ...value, endDate: null })}
+                  className="text-2xs px-1.5 py-0.5 rounded hover:bg-rose-50 text-rose-600 font-medium cursor-pointer"
+                  title="Clear end date"
+                >
+                  Never
+                </button>
+              )}
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -144,6 +144,12 @@ describe('TaskList Component', () => {
     const intervalInput = screen.getByRole('spinbutton');
     fireEvent.change(intervalInput, { target: { value: '2' } });
 
+    // Verify that single-task To Do Date and Deadline are replaced by Starts On and Ends On
+    expect(screen.queryByLabelText(/todo date \(execution\)/i)).toBeNull();
+    expect(screen.queryByLabelText(/deadline:/i)).toBeNull();
+    expect(screen.getByLabelText(/starts on:/i)).toBeDefined();
+    expect(screen.getByLabelText(/ends on \(optional\):/i)).toBeDefined();
+
     // Submit form
     const form = titleInput.closest('form')!;
     fireEvent.submit(form);
@@ -152,10 +158,10 @@ describe('TaskList Component', () => {
       expect(createSpy).toHaveBeenCalledWith(
         expect.objectContaining({
           title: 'Water the plants',
-          recurrenceRule: {
+          recurrenceRule: expect.objectContaining({
             frequency: RecurrenceFrequency.DAILY,
             interval: 2,
-          },
+          }),
         }),
       );
     });

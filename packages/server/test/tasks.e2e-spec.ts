@@ -318,5 +318,43 @@ describe('Tasks API Integration (User Scoping, AuthGuard & Multi-Tenancy)', () =
       expect(nextTask.recurrenceRule?.frequency).toBe('DAILY');
       expect(nextTask.parentTaskId).toBe(taskId);
     });
+
+    it('terminates recurring tasks and ceases spawning when next date exceeds endDate', async () => {
+      const { accessToken } = await createTestUser('terminal_repeat@example.com');
+
+      // Create a recurring task with endDate = 2026-10-04
+      const createRes = await request(app.getHttpServer())
+        .post('/api/tasks')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({
+          title: 'Final Quarter Review',
+          todoDate: '2026-10-04',
+          recurrenceRule: {
+            frequency: 'DAILY',
+            endDate: '2026-10-04',
+          },
+        })
+        .expect(201);
+
+      const taskId = createRes.body.id;
+
+      // Complete on 2026-10-04. Next date would be 2026-10-05 (> endDate)
+      await request(app.getHttpServer())
+        .patch(`/api/tasks/${taskId}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .set('x-simulated-date', '2026-10-04')
+        .send({ isCompleted: true })
+        .expect(200);
+
+      // Verify task list: should only have the 1 completed task, no next occurrence spawned!
+      const listRes = await request(app.getHttpServer())
+        .get('/api/tasks')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .expect(200);
+
+      expect(listRes.body).toHaveLength(1);
+      expect(listRes.body[0].id).toBe(taskId);
+      expect(listRes.body[0].isCompleted).toBe(true);
+    });
   });
 });

@@ -195,9 +195,18 @@ describe('TaskItem & Inline Editing', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /edit task/i }));
 
+    // Initially shows single-task date controls
+    expect(screen.getByLabelText(/todo date \(execution\):/i)).toBeDefined();
+
     // Change recurrence frequency to WEEKLY
     const freqSelect = screen.getByLabelText(/repeat frequency/i);
     fireEvent.change(freqSelect, { target: { value: RecurrenceFrequency.WEEKLY } });
+
+    // Single-task date controls are hidden, replaced by Starts on and Ends on
+    expect(screen.queryByLabelText(/todo date \(execution\):/i)).toBeNull();
+    expect(screen.queryByLabelText(/deadline \(cutoff\):/i)).toBeNull();
+    expect(screen.getByLabelText(/starts on:/i)).toBeDefined();
+    expect(screen.getByLabelText(/ends on \(optional\):/i)).toBeDefined();
 
     const saveBtn = screen.getByRole('button', { name: /save changes/i });
     fireEvent.click(saveBtn);

@@ -30,8 +30,8 @@ export function TaskList() {
       {
         title: trimmed,
         description: description.trim() ? description.trim() : undefined,
-        todoDate: todoDate || undefined,
-        deadline: deadline ? `${deadline}T23:59:59.000Z` : undefined,
+        todoDate: recurrenceRule ? undefined : todoDate || undefined,
+        deadline: recurrenceRule ? undefined : deadline ? `${deadline}T23:59:59.000Z` : undefined,
         recurrenceRule: recurrenceRule || undefined,
       },
       {
@@ -128,49 +128,51 @@ export function TaskList() {
               />
             </div>
 
-            {/* Date Pickers */}
-            <div className="flex flex-wrap gap-4">
-              <div className="flex items-center gap-2">
-                <label
-                  htmlFor="todo-date-input"
-                  className="text-slate-600 font-medium flex items-center gap-1"
-                >
-                  <CalendarDays className="w-3.5 h-3.5 text-indigo-600" />
-                  <span>Todo Date (Execution):</span>
-                </label>
-                <input
-                  id="todo-date-input"
-                  type="date"
-                  value={todoDate}
-                  onChange={(e) => setTodoDate(e.target.value)}
-                  className="px-2 py-1 rounded border border-slate-200 bg-white font-mono text-slate-700 text-xs shadow-2xs focus:ring-1 focus:ring-indigo-500 focus:outline-hidden"
-                />
-                <button
-                  type="button"
-                  onClick={() => setTodoDate(currentDate)}
-                  className="text-2xs text-indigo-600 hover:underline cursor-pointer"
-                >
-                  Today
-                </button>
-              </div>
+            {/* Single-Task Date Pickers (Hidden when Repeating) */}
+            {!recurrenceRule && (
+              <div className="flex flex-wrap gap-4">
+                <div className="flex items-center gap-2">
+                  <label
+                    htmlFor="todo-date-input"
+                    className="text-slate-600 font-medium flex items-center gap-1"
+                  >
+                    <CalendarDays className="w-3.5 h-3.5 text-indigo-600" />
+                    <span>Todo Date (Execution):</span>
+                  </label>
+                  <input
+                    id="todo-date-input"
+                    type="date"
+                    value={todoDate}
+                    onChange={(e) => setTodoDate(e.target.value)}
+                    className="px-2 py-1 rounded border border-slate-200 bg-white font-mono text-slate-700 text-xs shadow-2xs focus:ring-1 focus:ring-indigo-500 focus:outline-hidden"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setTodoDate(currentDate)}
+                    className="text-2xs text-indigo-600 hover:underline cursor-pointer"
+                  >
+                    Today
+                  </button>
+                </div>
 
-              <div className="flex items-center gap-2">
-                <label
-                  htmlFor="deadline-input"
-                  className="text-slate-600 font-medium flex items-center gap-1"
-                >
-                  <Clock className="w-3.5 h-3.5 text-rose-600" />
-                  <span>Deadline:</span>
-                </label>
-                <input
-                  id="deadline-input"
-                  type="date"
-                  value={deadline}
-                  onChange={(e) => setDeadline(e.target.value)}
-                  className="px-2 py-1 rounded border border-slate-200 bg-white font-mono text-slate-700 text-xs shadow-2xs focus:ring-1 focus:ring-rose-500 focus:outline-hidden"
-                />
+                <div className="flex items-center gap-2">
+                  <label
+                    htmlFor="deadline-input"
+                    className="text-slate-600 font-medium flex items-center gap-1"
+                  >
+                    <Clock className="w-3.5 h-3.5 text-rose-600" />
+                    <span>Deadline:</span>
+                  </label>
+                  <input
+                    id="deadline-input"
+                    type="date"
+                    value={deadline}
+                    onChange={(e) => setDeadline(e.target.value)}
+                    className="px-2 py-1 rounded border border-slate-200 bg-white font-mono text-slate-700 text-xs shadow-2xs focus:ring-1 focus:ring-rose-500 focus:outline-hidden"
+                  />
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Recurrence Rule Controls */}
             <RecurrencePicker

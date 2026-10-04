@@ -55,8 +55,12 @@ export function TaskEditForm({
     const dto: UpdateTaskDto = {
       title: trimmedTitle,
       description: description.trim() ? description.trim() : null,
-      todoDate: todoDate ? todoDate : null,
-      deadline: deadline ? `${deadline}T23:59:59.000Z` : null,
+      todoDate: recurrenceRule
+        ? (recurrenceRule.startDate ?? (todoDate ? todoDate : null))
+        : todoDate
+          ? todoDate
+          : null,
+      deadline: recurrenceRule ? null : deadline ? `${deadline}T23:59:59.000Z` : null,
       recurrenceRule: recurrenceRule ?? null,
     };
 
@@ -140,82 +144,84 @@ export function TaskEditForm({
         )}
       </div>
 
-      {/* Date Controls */}
-      <div className="pt-2 border-t border-slate-100 flex flex-wrap gap-4 text-xs">
-        {/* Todo Date (Execution Day) */}
-        <div className="flex flex-col gap-1">
-          <label
-            htmlFor={`edit-todo-date-${task.id}`}
-            className="text-slate-600 font-medium flex items-center gap-1 text-2xs"
-          >
-            <CalendarDays className="w-3.5 h-3.5 text-indigo-600" />
-            <span>Todo Date (Execution):</span>
-          </label>
-          <div className="flex items-center gap-1.5">
-            <input
-              id={`edit-todo-date-${task.id}`}
-              type="date"
-              value={todoDate}
-              onChange={(e) => setTodoDate(e.target.value)}
-              className="px-2 py-1 rounded border border-slate-200 bg-white font-mono text-slate-700 text-xs shadow-2xs focus:ring-1 focus:ring-indigo-500 focus:outline-hidden"
-            />
-            <button
-              type="button"
-              onClick={() => setTodoDate(currentDate)}
-              className="text-2xs px-1.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium cursor-pointer"
+      {/* Single-Task Date Controls (Hidden when Repeating) */}
+      {!recurrenceRule && (
+        <div className="pt-2 border-t border-slate-100 flex flex-wrap gap-4 text-xs">
+          {/* Todo Date (Execution Day) */}
+          <div className="flex flex-col gap-1">
+            <label
+              htmlFor={`edit-todo-date-${task.id}`}
+              className="text-slate-600 font-medium flex items-center gap-1 text-2xs"
             >
-              Today
-            </button>
-            <button
-              type="button"
-              onClick={handleTomorrow}
-              className="text-2xs px-1.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium cursor-pointer"
-            >
-              +1d
-            </button>
-            {todoDate && (
+              <CalendarDays className="w-3.5 h-3.5 text-indigo-600" />
+              <span>Todo Date (Execution):</span>
+            </label>
+            <div className="flex items-center gap-1.5">
+              <input
+                id={`edit-todo-date-${task.id}`}
+                type="date"
+                value={todoDate}
+                onChange={(e) => setTodoDate(e.target.value)}
+                className="px-2 py-1 rounded border border-slate-200 bg-white font-mono text-slate-700 text-xs shadow-2xs focus:ring-1 focus:ring-indigo-500 focus:outline-hidden"
+              />
               <button
                 type="button"
-                onClick={() => setTodoDate('')}
-                className="text-2xs px-1.5 py-1 rounded hover:bg-rose-50 text-rose-600 font-medium cursor-pointer"
-                title="Clear todo date"
+                onClick={() => setTodoDate(currentDate)}
+                className="text-2xs px-1.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium cursor-pointer"
               >
-                Clear
+                Today
               </button>
-            )}
+              <button
+                type="button"
+                onClick={handleTomorrow}
+                className="text-2xs px-1.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium cursor-pointer"
+              >
+                +1d
+              </button>
+              {todoDate && (
+                <button
+                  type="button"
+                  onClick={() => setTodoDate('')}
+                  className="text-2xs px-1.5 py-1 rounded hover:bg-rose-50 text-rose-600 font-medium cursor-pointer"
+                  title="Clear todo date"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
           </div>
-        </div>
 
-        {/* Deadline (Cutoff Day) */}
-        <div className="flex flex-col gap-1">
-          <label
-            htmlFor={`edit-deadline-${task.id}`}
-            className="text-slate-600 font-medium flex items-center gap-1 text-2xs"
-          >
-            <Clock className="w-3.5 h-3.5 text-rose-600" />
-            <span>Deadline (Cutoff):</span>
-          </label>
-          <div className="flex items-center gap-1.5">
-            <input
-              id={`edit-deadline-${task.id}`}
-              type="date"
-              value={deadline}
-              onChange={(e) => setDeadline(e.target.value)}
-              className="px-2 py-1 rounded border border-slate-200 bg-white font-mono text-slate-700 text-xs shadow-2xs focus:ring-1 focus:ring-rose-500 focus:outline-hidden"
-            />
-            {deadline && (
-              <button
-                type="button"
-                onClick={() => setDeadline('')}
-                className="text-2xs px-1.5 py-1 rounded hover:bg-rose-50 text-rose-600 font-medium cursor-pointer"
-                title="Clear deadline"
-              >
-                Clear
-              </button>
-            )}
+          {/* Deadline (Cutoff Day) */}
+          <div className="flex flex-col gap-1">
+            <label
+              htmlFor={`edit-deadline-${task.id}`}
+              className="text-slate-600 font-medium flex items-center gap-1 text-2xs"
+            >
+              <Clock className="w-3.5 h-3.5 text-rose-600" />
+              <span>Deadline (Cutoff):</span>
+            </label>
+            <div className="flex items-center gap-1.5">
+              <input
+                id={`edit-deadline-${task.id}`}
+                type="date"
+                value={deadline}
+                onChange={(e) => setDeadline(e.target.value)}
+                className="px-2 py-1 rounded border border-slate-200 bg-white font-mono text-slate-700 text-xs shadow-2xs focus:ring-1 focus:ring-rose-500 focus:outline-hidden"
+              />
+              {deadline && (
+                <button
+                  type="button"
+                  onClick={() => setDeadline('')}
+                  className="text-2xs px-1.5 py-1 rounded hover:bg-rose-50 text-rose-600 font-medium cursor-pointer"
+                  title="Clear deadline"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Recurrence Rule Controls */}
       <RecurrencePicker

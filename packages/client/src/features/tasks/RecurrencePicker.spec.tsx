@@ -13,7 +13,7 @@ describe('RecurrencePicker Component', () => {
     expect(screen.queryByTestId('recurrence-preview-badge')).toBeNull();
   });
 
-  it('selects DAILY and updates interval', () => {
+  it('selects DAILY and updates interval and defaults startDate to currentDate', () => {
     const onChange = vi.fn();
     const { rerender } = render(
       <RecurrencePicker value={null} onChange={onChange} currentDate="2026-10-04" />,
@@ -25,11 +25,17 @@ describe('RecurrencePicker Component', () => {
     expect(onChange).toHaveBeenCalledWith({
       frequency: RecurrenceFrequency.DAILY,
       interval: 1,
+      startDate: '2026-10-04',
+      endDate: undefined,
     });
 
     rerender(
       <RecurrencePicker
-        value={{ frequency: RecurrenceFrequency.DAILY, interval: 1 }}
+        value={{
+          frequency: RecurrenceFrequency.DAILY,
+          interval: 1,
+          startDate: '2026-10-04',
+        }}
         onChange={onChange}
         currentDate="2026-10-04"
       />,
@@ -43,6 +49,7 @@ describe('RecurrencePicker Component', () => {
     expect(onChange).toHaveBeenCalledWith({
       frequency: RecurrenceFrequency.DAILY,
       interval: 3,
+      startDate: '2026-10-04',
     });
   });
 
@@ -128,6 +135,42 @@ describe('RecurrencePicker Component', () => {
     );
 
     expect(screen.getByTestId('recurrence-preview-badge').textContent).toBe('Yearly on Oct 4');
+  });
+
+  it('configures horizon startDate and endDate', () => {
+    const onChange = vi.fn();
+    render(
+      <RecurrencePicker
+        value={{
+          frequency: RecurrenceFrequency.DAILY,
+          interval: 1,
+          startDate: '2026-10-04',
+          endDate: null,
+        }}
+        onChange={onChange}
+        currentDate="2026-10-04"
+      />,
+    );
+
+    const startDateInput = screen.getByLabelText(/starts on:/i);
+    fireEvent.change(startDateInput, { target: { value: '2026-10-15' } });
+
+    expect(onChange).toHaveBeenCalledWith({
+      frequency: RecurrenceFrequency.DAILY,
+      interval: 1,
+      startDate: '2026-10-15',
+      endDate: null,
+    });
+
+    const endDateInput = screen.getByLabelText(/ends on \(optional\):/i);
+    fireEvent.change(endDateInput, { target: { value: '2026-12-31' } });
+
+    expect(onChange).toHaveBeenCalledWith({
+      frequency: RecurrenceFrequency.DAILY,
+      interval: 1,
+      startDate: '2026-10-04',
+      endDate: '2026-12-31',
+    });
   });
 
   it('clears recurrence when Clear button is clicked', () => {

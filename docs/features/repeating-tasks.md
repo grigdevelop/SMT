@@ -6,12 +6,15 @@ In traditional task systems, repeating tasks either clog the database with pre-g
 
 - **The Single-Active-Instance Law (Jason Fried):** A repeating task maintains exactly one active pending instance at any given time. When you complete today's occurrence, the completed task remains logged in history, and the system immediately schedules the _next_ occurrence for its upcoming civil execution day (`todo_date`).
 - **No Background Daemons (John Carmack):** Recurrence is computed synchronously within the completion database transaction. Zero background cron daemons, zero polling overhead, zero CPU waste when idle.
+- **Dynamic Date Semantics (Council Consensus):**
+  - **One-off tasks:** Display **To Do Date** (execution day) and **Deadline** (hard cutoff moment).
+  - **Repeating tasks:** Replace static single-task dates with **Starts on** (default: today) and **Ends on** (optional stop condition). Static deadlines are eliminated for recurring tasks to prevent stale overdue bugs.
 
 ---
 
 ## 2. Recurrence Frequencies & Rules
 
-The system supports four distinct real-world rhythms:
+The system supports four distinct real-world rhythms, bounded by optional start and end dates:
 
 | Frequency   | Identifier | Configurable Parameters                      | Example Real-World Use Case                                                                  |
 | :---------- | :--------- | :------------------------------------------- | :------------------------------------------------------------------------------------------- |
@@ -19,6 +22,11 @@ The system supports four distinct real-world rhythms:
 | **Weekly**  | `WEEKLY`   | `daysOfWeek: number[]` (0=Sun..6=Sat)        | Gym workouts on Monday, Wednesday, Friday (`[1, 3, 5]`).                                     |
 | **Monthly** | `MONTHLY`  | `daysOfMonth: number[]` (1..31)              | Pay rent on the 1st (`[1]`), audit finances on the 15th & 30th (`[15, 30]`).                 |
 | **Yearly**  | `YEARLY`   | `yearlyDate: { month: number, day: number }` | File annual taxes on April 15 (`{ month: 4, day: 15 }`), celebrate anniversary on October 4. |
+
+### 2.1 Boundary Horizon Parameters
+
+- **`startDate` (`YYYY-MM-DD`, optional, default: today)**: The horizon date when the routine begins. The initial occurrence is scheduled on or after this date.
+- **`endDate` (`YYYY-MM-DD`, optional, default: null)**: The horizon date after which the routine stops repeating. Once `nextTodoDate > endDate`, the recurrence terminates naturally.
 
 ---
 
@@ -35,22 +43,25 @@ CREATE INDEX idx_tasks_parent_task_id ON tasks(parent_task_id);
 
 ### 3.1 Field Semantics
 
-- `recurrence_rule`: A validated JSONB object storing the frequency and rule parameters.
+- `recurrence_rule`: A validated JSONB object storing the frequency, schedule parameters, `startDate`, and `endDate`.
 - `parent_task_id`: Points to the original parent task template in the chain, enabling historical lineage tracking while allowing each completed occurrence to stand as an independent immutable record.
+- Each materialized instance possesses its own single civil `todo_date` (`YYYY-MM-DD`).
 
 ---
 
-## 4. Pure Functional Date Calculation Engine (`calculateNextTodoDate`)
+## 4. Pure Functional Date Calculation Engine (`calculateNextTodoDate` & `calculateInitialTodoDate`)
 
-Next occurrence calculation is a pure deterministic function executed with zero side effects:
+Occurrence calculations are pure deterministic functions executed with zero side effects:
 
-$$\text{calculateNextTodoDate}(\text{rule: RecurrenceRule}, \text{referenceDateStr: 'YYYY-MM-DD'}): \text{'YYYY-MM-DD'}$$
+$$\text{calculateNextTodoDate}(\text{rule: RecurrenceRule}, \text{referenceDateStr: 'YYYY-MM-DD'}): \text{'YYYY-MM-DD' | null}$$
+$$\text{calculateInitialTodoDate}(\text{rule: RecurrenceRule}, \text{referenceDateStr: 'YYYY-MM-DD'}): \text{'YYYY-MM-DD'}$$
 
-### 4.1 Edge Cases & Calendar Clamping (Anders Hejlsberg)
+### 4.1 Termination & Calendar Clamping (Anders Hejlsberg)
 
-1. **End-of-Month Clamping:** If a task repeats on day 31, in months with 30 days (April, June, Sept, Nov) it clamps to day 30. In February, it clamps to day 28 (or 29 in leap years).
-2. **Weekly Day Cycling:** If today is Wednesday and the rule is `[1, 3, 5]` (Mon, Wed, Fri), the next date is Friday. If today is Friday, the next date cycles forward to next Monday (+3 days).
-3. **Reference Point:** Calculations always project forward from **today's civil reference date** (or simulated date), ensuring that overdue tasks never spawn an already-overdue subsequent occurrence.
+1. **Cycle Termination:** If `rule.endDate` is configured and the computed next date exceeds `rule.endDate` (`nextDate > rule.endDate`), the function returns `null`. The backend commits completion and ceases further materialization.
+2. **End-of-Month Clamping:** If a task repeats on day 31, in months with 30 days (April, June, Sept, Nov) it clamps to day 30. In February, it clamps to day 28 (or 29 in leap years).
+3. **Weekly Day Cycling:** If today is Wednesday and the rule is `[1, 3, 5]` (Mon, Wed, Fri), the next date is Friday. If today is Friday, the next date cycles forward to next Monday (+3 days).
+4. **Reference Point:** Calculations always project forward from **today's civil reference date** (or simulated date), ensuring that overdue tasks never spawn an already-overdue subsequent occurrence.
 
 ---
 
@@ -63,11 +74,13 @@ flowchart TD
     A["User clicks Checkbox on Recurring Task"] --> B["PATCH /api/tasks/:id { isCompleted: true }"]
     B --> C["Kysely Database Transaction"]
     C --> D["1. UPDATE current task: is_completed = true, completed_at = now()"]
-    C --> E["2. calculateNextTodoDate(recurrence_rule, referenceDate)"]
-    C --> F["3. INSERT next task instance: todo_date = nextDate, is_completed = false"]
-    F --> G["Commit Transaction"]
-    G --> H["Client TanStack Query Cache Refreshed (0ms)"]
-    H --> I["Norman Signifier: 'Completed! Next scheduled for Oct 7'"]
+    C --> E["2. nextDate = calculateNextTodoDate(recurrence_rule, referenceDate)"]
+    E --> F{"nextDate !== null?"}
+    F -->|"Yes (Under endDate)"| G["3. INSERT next instance: todo_date = nextDate, is_completed = false"]
+    F -->|"No (Exceeded endDate)"| H["Cycle Complete: No new row inserted"]
+    G --> I["Commit Transaction"]
+    H --> I
+    I --> J["Client TanStack Query Cache Refreshed (0ms)"]
 ```
 
 Both operations are committed atomically. If the insertion of the next occurrence fails, the completion rolls back.
@@ -76,15 +89,21 @@ Both operations are committed atomically. If the insertion of the next occurrenc
 
 ## 6. UI/UX & Cognitive Ergonomics (Don Norman)
 
-### 6.1 Progressive Disclosure in Creation & Edit Forms
+### 6.1 Progressive Disclosure & Semantic Date Swapping
 
-- **Recurrence Toggle:** In the details drawer, a dropdown presents: `Does not repeat`, `Daily`, `Weekly`, `Monthly`, `Yearly`.
-- Selecting a frequency progressively reveals only the relevant sub-controls:
-  - **Weekly:** Seven circular weekday pills (`M`, `T`, `W`, `T`, `F`, `S`, `S`).
+- **Non-Repeating Mode:** The details drawer and edit form display standard single-task date pickers:
+  - `To Do Date (Execution)`
+  - `Deadline (Cutoff)`
+- **Repeating Mode:** The single-task date pickers are replaced by recurrence horizon pickers:
+  - `Starts on:` (Date picker, default: Today). Signifies the first active occurrence day.
+  - `Ends on:` (Optional date picker, default: Never). Signifies when the routine stops.
+- Selecting a frequency progressively reveals only the relevant frequency sub-controls:
+  - **Daily:** Interval input (`Every [N] day(s)`).
+  - **Weekly:** Seven circular weekday toggle pills (`M`, `T`, `W`, `T`, `F`, `S`, `S`).
   - **Monthly:** Multi-select chips for days `1` through `31`.
   - **Yearly:** Month dropdown and day selector.
 
 ### 6.2 Recurrence Signifier on Task Cards
 
-- Recurring tasks display a distinct **Repeat icon (`RotateCw`)** and a human-readable subtitle (e.g., _"Repeats Mon, Wed, Fri"_ or _"Repeats Monthly on 1st"_).
-- The completion checkbox remains responsive and provides immediate feedback indicating when the task is next scheduled.
+- Recurring tasks display a distinct **Repeat icon (`RotateCw`)** and a human-readable badge (e.g., _"Weekly: Mon, Wed, Fri"_, _"Daily"_, or _"Weekly: Fri (until 2026-12-31)"_).
+- Materialized task instances display their specific execution day: `Todo: YYYY-MM-DD`.

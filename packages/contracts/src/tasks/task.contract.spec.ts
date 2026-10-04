@@ -4,6 +4,7 @@ import {
   UpdateTaskSchema,
   getTaskStatus,
   TaskStatus,
+  calculateInitialTodoDate,
   calculateNextTodoDate,
   formatRecurrenceLabel,
 } from './task.contract';
@@ -158,7 +159,42 @@ describe('Task Contracts (Zod Validation & Status Lifecycle)', () => {
       expect(calculateNextTodoDate(rule, '2026-12-26')).toBe('2027-12-25');
     });
 
-    it('generates friendly human-readable recurrence labels', () => {
+    it('calculates initial todo date considering startDate', () => {
+      // Daily with future startDate
+      expect(
+        calculateInitialTodoDate({ frequency: 'DAILY', startDate: '2026-10-10' }, '2026-10-04'),
+      ).toBe('2026-10-10');
+
+      // Weekly: starting on Sun Oct 4 (day 0) with Mon (1) and Fri (5)
+      expect(
+        calculateInitialTodoDate(
+          { frequency: 'WEEKLY', daysOfWeek: [1, 5], startDate: '2026-10-04' },
+          '2026-10-04',
+        ),
+      ).toBe('2026-10-05');
+
+      // Weekly: starting on Mon Oct 5 (day 1) with Mon (1) and Fri (5)
+      expect(
+        calculateInitialTodoDate(
+          { frequency: 'WEEKLY', daysOfWeek: [1, 5], startDate: '2026-10-05' },
+          '2026-10-04',
+        ),
+      ).toBe('2026-10-05');
+    });
+
+    it('terminates recurrence when next occurrence exceeds endDate', () => {
+      const rule = {
+        frequency: 'DAILY' as const,
+        endDate: '2026-10-05',
+      };
+      // From Oct 4, next is Oct 5 (valid, <= endDate)
+      expect(calculateNextTodoDate(rule, '2026-10-04')).toBe('2026-10-05');
+
+      // From Oct 5, next would be Oct 6 (exceeds endDate -> returns null)
+      expect(calculateNextTodoDate(rule, '2026-10-05')).toBeNull();
+    });
+
+    it('generates friendly human-readable recurrence labels including endDate', () => {
       expect(formatRecurrenceLabel({ frequency: 'DAILY' })).toBe('Daily');
       expect(formatRecurrenceLabel({ frequency: 'WEEKLY', daysOfWeek: [1, 3, 5] })).toBe(
         'Weekly: Mon, Wed, Fri',
@@ -172,6 +208,13 @@ describe('Task Contracts (Zod Validation & Status Lifecycle)', () => {
           yearlyDate: { month: 10, day: 4 },
         }),
       ).toBe('Yearly on Oct 4');
+      expect(
+        formatRecurrenceLabel({
+          frequency: 'WEEKLY',
+          daysOfWeek: [5],
+          endDate: '2026-12-31',
+        }),
+      ).toBe('Weekly: Fri (until 2026-12-31)');
     });
   });
 });
