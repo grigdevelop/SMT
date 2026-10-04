@@ -271,5 +271,52 @@ describe('Tasks API Integration (User Scoping, AuthGuard & Multi-Tenancy)', () =
 
       expect(patchRes.body.isCompleted).toBe(true);
     });
+
+    it('spawns next occurrence upon completion for recurring tasks', async () => {
+      const { accessToken } = await createTestUser('carmack_repeat@example.com');
+
+      // 1. Create a daily recurring task
+      const createRes = await request(app.getHttpServer())
+        .post('/api/tasks')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({
+          title: 'Daily System Profiling',
+          todoDate: '2026-10-04',
+          recurrenceRule: { frequency: 'DAILY' },
+        })
+        .expect(201);
+
+      const taskId = createRes.body.id;
+      expect(createRes.body.recurrenceRule?.frequency).toBe('DAILY');
+
+      // 2. Complete the task on simulated date 2026-10-04
+      const patchRes = await request(app.getHttpServer())
+        .patch(`/api/tasks/${taskId}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .set('x-simulated-date', '2026-10-04')
+        .send({ isCompleted: true })
+        .expect(200);
+
+      expect(patchRes.body.isCompleted).toBe(true);
+
+      // 3. Query all tasks for user: should have 2 tasks (1 completed for Oct 4, 1 pending for Oct 5)
+      const listRes = await request(app.getHttpServer())
+        .get('/api/tasks')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .expect(200);
+
+      expect(listRes.body).toHaveLength(2);
+
+      const completedTask = listRes.body.find((t: { id: string }) => t.id === taskId);
+      expect(completedTask.isCompleted).toBe(true);
+      expect(completedTask.todoDate).toBe('2026-10-04');
+
+      const nextTask = listRes.body.find((t: { id: string }) => t.id !== taskId);
+      expect(nextTask.isCompleted).toBe(false);
+      expect(nextTask.title).toBe('Daily System Profiling');
+      expect(nextTask.todoDate).toBe('2026-10-05');
+      expect(nextTask.recurrenceRule?.frequency).toBe('DAILY');
+      expect(nextTask.parentTaskId).toBe(taskId);
+    });
   });
 });

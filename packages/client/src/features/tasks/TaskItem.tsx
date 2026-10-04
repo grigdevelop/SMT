@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { TaskDto, UpdateTaskDto } from '@self/contracts';
-import { getTaskStatus, TaskStatus } from '@self/contracts';
+import { getTaskStatus, TaskStatus, formatRecurrenceLabel } from '@self/contracts';
 import { TaskEditForm } from './TaskEditForm';
 import { MarkdownViewer } from '../../components/MarkdownViewer';
 import {
@@ -14,6 +14,7 @@ import {
   FileText,
   ChevronDown,
   ChevronUp,
+  RotateCw,
 } from 'lucide-react';
 
 export interface TaskItemProps {
@@ -138,6 +139,18 @@ export function TaskItem({ task, currentDate, onToggle, onDelete, onUpdate }: Ta
                 >
                   <Clock className="w-3 h-3 opacity-70" />
                   Cutoff: {task.deadline.slice(0, 10)}
+                </span>
+              )}
+
+              {/* Recurrence Badge */}
+              {task.recurrenceRule && (
+                <span
+                  data-testid="recurrence-badge"
+                  className="inline-flex items-center gap-1 text-2xs px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 font-medium border border-indigo-200"
+                  title={`Recurring task: ${formatRecurrenceLabel(task.recurrenceRule)}`}
+                >
+                  <RotateCw className="w-3 h-3 text-indigo-500" />
+                  <span>{formatRecurrenceLabel(task.recurrenceRule)}</span>
                 </span>
               )}
 

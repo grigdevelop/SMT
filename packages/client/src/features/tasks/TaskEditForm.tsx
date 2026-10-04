@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import type { TaskDto, UpdateTaskDto } from '@self/contracts';
+import type { TaskDto, UpdateTaskDto, RecurrenceRule } from '@self/contracts';
 import { CalendarDays, Clock, Check, X, FileText } from 'lucide-react';
 import { parseLocalDate, formatLocalDate } from '../../lib/date-context';
 import { MarkdownToolbar } from '../../components/MarkdownToolbar';
 import { MarkdownViewer } from '../../components/MarkdownViewer';
+import { RecurrencePicker } from './RecurrencePicker';
 
 export interface TaskEditFormProps {
   task: TaskDto;
@@ -25,6 +26,9 @@ export function TaskEditForm({
   const [descMode, setDescMode] = useState<'write' | 'preview'>('write');
   const [todoDate, setTodoDate] = useState(task.todoDate ?? '');
   const [deadline, setDeadline] = useState(task.deadline ? task.deadline.slice(0, 10) : '');
+  const [recurrenceRule, setRecurrenceRule] = useState<RecurrenceRule | null>(
+    task.recurrenceRule ?? null,
+  );
 
   const inputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -53,6 +57,7 @@ export function TaskEditForm({
       description: description.trim() ? description.trim() : null,
       todoDate: todoDate ? todoDate : null,
       deadline: deadline ? `${deadline}T23:59:59.000Z` : null,
+      recurrenceRule: recurrenceRule ?? null,
     };
 
     onSave(dto);
@@ -211,6 +216,13 @@ export function TaskEditForm({
           </div>
         </div>
       </div>
+
+      {/* Recurrence Rule Controls */}
+      <RecurrencePicker
+        value={recurrenceRule}
+        onChange={setRecurrenceRule}
+        currentDate={currentDate}
+      />
 
       {/* Action Buttons */}
       <div className="pt-2 border-t border-slate-100 flex items-center justify-end gap-2">

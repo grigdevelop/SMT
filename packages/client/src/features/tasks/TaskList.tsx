@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import type { RecurrenceRule } from '@self/contracts';
 import { useTasks, useCreateTask, useToggleTask, useDeleteTask, useUpdateTask } from './use-tasks';
 import { useCurrentDate } from '../../lib/date-context';
 import { TaskItem } from './TaskItem';
+import { RecurrencePicker } from './RecurrencePicker';
 import { Plus, Loader2, Calendar, Clock, CalendarDays, FileText } from 'lucide-react';
 
 export function TaskList() {
@@ -9,6 +11,7 @@ export function TaskList() {
   const [description, setDescription] = useState('');
   const [todoDate, setTodoDate] = useState('');
   const [deadline, setDeadline] = useState('');
+  const [recurrenceRule, setRecurrenceRule] = useState<RecurrenceRule | null>(null);
   const [showDetails, setShowDetails] = useState(false);
 
   const { currentDate } = useCurrentDate();
@@ -29,6 +32,7 @@ export function TaskList() {
         description: description.trim() ? description.trim() : undefined,
         todoDate: todoDate || undefined,
         deadline: deadline ? `${deadline}T23:59:59.000Z` : undefined,
+        recurrenceRule: recurrenceRule || undefined,
       },
       {
         onSuccess: () => {
@@ -36,6 +40,7 @@ export function TaskList() {
           setDescription('');
           setTodoDate('');
           setDeadline('');
+          setRecurrenceRule(null);
           setShowDetails(false);
         },
       },
@@ -82,7 +87,7 @@ export function TaskList() {
             onClick={() => setShowDetails(!showDetails)}
             title="Set execution date, deadline, or notes"
             className={`px-3 py-2.5 border rounded-lg text-xs font-medium flex items-center gap-1.5 transition cursor-pointer ${
-              showDetails || todoDate || deadline || description
+              showDetails || todoDate || deadline || description || recurrenceRule
                 ? 'bg-indigo-50 border-indigo-200 text-indigo-700'
                 : 'border-slate-200 hover:bg-slate-50 text-slate-600'
             }`}
@@ -166,6 +171,13 @@ export function TaskList() {
                 />
               </div>
             </div>
+
+            {/* Recurrence Rule Controls */}
+            <RecurrencePicker
+              value={recurrenceRule}
+              onChange={setRecurrenceRule}
+              currentDate={currentDate}
+            />
           </div>
         )}
       </form>

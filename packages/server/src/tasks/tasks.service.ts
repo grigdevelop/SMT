@@ -1,5 +1,11 @@
 import { Injectable, NotFoundException, BadRequestException, Inject } from '@nestjs/common';
-import { CreateTaskDto, UpdateTaskDto, TaskDto } from '@self/contracts';
+import {
+  CreateTaskDto,
+  UpdateTaskDto,
+  TaskDto,
+  calculateNextTodoDate,
+  RecurrenceRule,
+} from '@self/contracts';
 import { Selectable } from 'kysely';
 import { TaskTable } from '../database/types';
 import { TasksRepository } from './tasks.repository';
@@ -13,6 +19,18 @@ function formatTodoDate(val: unknown): string | null {
     return `${year}-${month}-${day}`;
   }
   return String(val).slice(0, 10);
+}
+
+function parseRecurrenceRule(val: unknown): RecurrenceRule | null {
+  if (!val) return null;
+  if (typeof val === 'string') {
+    try {
+      return JSON.parse(val) as RecurrenceRule;
+    } catch {
+      return null;
+    }
+  }
+  return val as RecurrenceRule;
 }
 
 @Injectable()
@@ -39,6 +57,7 @@ export class TasksService {
       todo_date: dto.todoDate ?? null,
       deadline: dto.deadline ?? dto.dueDate ?? null,
       due_date: dto.dueDate ?? dto.deadline ?? null,
+      recurrence_rule: dto.recurrenceRule ?? null,
     });
     return this.toDto(row);
   }
@@ -49,7 +68,7 @@ export class TasksService {
     dto: UpdateTaskDto,
     simulatedDate?: string,
   ): Promise<TaskDto> {
-    // If completing the task, enforce the "only-when" execution day guard
+    // If completing the task, enforce the "only-when" guard and spawn recurring next occurrence
     if (dto.isCompleted === true) {
       const existing = await this.repository.findById(id, userId);
       if (!existing) {
@@ -59,17 +78,33 @@ export class TasksService {
       const scheduledDate =
         dto.todoDate !== undefined ? dto.todoDate : formatTodoDate(existing.todo_date);
 
-      if (scheduledDate) {
-        const today =
-          simulatedDate && /^\d{4}-\d{2}-\d{2}$/.test(simulatedDate)
-            ? simulatedDate
-            : new Date().toISOString().slice(0, 10);
+      const today =
+        simulatedDate && /^\d{4}-\d{2}-\d{2}$/.test(simulatedDate)
+          ? simulatedDate
+          : new Date().toISOString().slice(0, 10);
 
-        if (scheduledDate > today) {
-          throw new BadRequestException(
-            `Cannot complete task before its scheduled date (${scheduledDate}).`,
-          );
-        }
+      if (scheduledDate && scheduledDate > today) {
+        throw new BadRequestException(
+          `Cannot complete task before its scheduled date (${scheduledDate}).`,
+        );
+      }
+
+      // Check if task is recurring and spawn the next occurrence
+      const rule =
+        dto.recurrenceRule !== undefined
+          ? dto.recurrenceRule
+          : parseRecurrenceRule(existing.recurrence_rule);
+
+      if (rule) {
+        const nextTodoDate = calculateNextTodoDate(rule, today);
+
+        await this.repository.create(userId, {
+          title: existing.title,
+          description: existing.description,
+          todo_date: nextTodoDate,
+          recurrence_rule: rule,
+          parent_task_id: existing.parent_task_id || existing.id,
+        });
       }
     }
 
@@ -80,6 +115,7 @@ export class TasksService {
       todo_date: dto.todoDate,
       deadline: dto.deadline !== undefined ? dto.deadline : dto.dueDate,
       due_date: dto.dueDate !== undefined ? dto.dueDate : dto.deadline,
+      recurrence_rule: dto.recurrenceRule,
     });
 
     if (!row) {
@@ -105,6 +141,8 @@ export class TasksService {
       todoDate: formatTodoDate(row.todo_date),
       deadline: deadlineVal ? new Date(deadlineVal).toISOString() : null,
       dueDate: row.due_date ? new Date(row.due_date).toISOString() : null,
+      recurrenceRule: parseRecurrenceRule(row.recurrence_rule),
+      parentTaskId: row.parent_task_id,
       createdAt: new Date(row.created_at).toISOString(),
       updatedAt: new Date(row.updated_at).toISOString(),
     };

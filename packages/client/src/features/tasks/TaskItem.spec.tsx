@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { TaskItem } from './TaskItem';
 import type { TaskDto } from '@self/contracts';
+import { RecurrenceFrequency } from '@self/contracts';
 
 const mockTask: TaskDto = {
   id: 'task-123',
@@ -10,6 +11,7 @@ const mockTask: TaskDto = {
   isCompleted: false,
   todoDate: '2026-10-04',
   deadline: '2026-10-10T23:59:59.000Z',
+  recurrenceRule: null,
   dueDate: null,
   createdAt: '2026-10-04T00:00:00.000Z',
   updatedAt: '2026-10-04T00:00:00.000Z',
@@ -22,6 +24,23 @@ const mockTaskWithDescription: TaskDto = {
   isCompleted: false,
   todoDate: '2026-10-04',
   deadline: null,
+  recurrenceRule: null,
+  dueDate: null,
+  createdAt: '2026-10-04T00:00:00.000Z',
+  updatedAt: '2026-10-04T00:00:00.000Z',
+};
+
+const mockRecurringTask: TaskDto = {
+  id: 'task-789',
+  title: 'Daily Standup Meeting',
+  description: null,
+  isCompleted: false,
+  todoDate: '2026-10-04',
+  deadline: null,
+  recurrenceRule: {
+    frequency: RecurrenceFrequency.DAILY,
+    interval: 1,
+  },
   dueDate: null,
   createdAt: '2026-10-04T00:00:00.000Z',
   updatedAt: '2026-10-04T00:00:00.000Z',
@@ -45,6 +64,26 @@ describe('TaskItem & Inline Editing', () => {
 
     expect(screen.getByText('Refactor Query Cache')).toBeDefined();
     expect(screen.getByRole('button', { name: /edit task/i })).toBeDefined();
+  });
+
+  it('renders recurrence badge when task has recurrenceRule', () => {
+    const onToggle = vi.fn();
+    const onDelete = vi.fn();
+    const onUpdate = vi.fn();
+
+    render(
+      <TaskItem
+        task={mockRecurringTask}
+        currentDate="2026-10-04"
+        onToggle={onToggle}
+        onDelete={onDelete}
+        onUpdate={onUpdate}
+      />,
+    );
+
+    const badge = screen.getByTestId('recurrence-badge');
+    expect(badge).toBeDefined();
+    expect(badge.textContent).toContain('Daily');
   });
 
   it('renders Notes button and toggles formatted Markdown viewer', () => {
@@ -135,7 +174,42 @@ describe('TaskItem & Inline Editing', () => {
       description: 'Notes with **bold**',
       todoDate: '2026-10-04',
       deadline: '2026-10-10T23:59:59.000Z',
+      recurrenceRule: null,
     });
+  });
+
+  it('allows configuring recurrence rule in edit mode and saving', () => {
+    const onToggle = vi.fn();
+    const onDelete = vi.fn();
+    const onUpdate = vi.fn();
+
+    render(
+      <TaskItem
+        task={mockTask}
+        currentDate="2026-10-04"
+        onToggle={onToggle}
+        onDelete={onDelete}
+        onUpdate={onUpdate}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /edit task/i }));
+
+    // Change recurrence frequency to WEEKLY
+    const freqSelect = screen.getByLabelText(/repeat frequency/i);
+    fireEvent.change(freqSelect, { target: { value: RecurrenceFrequency.WEEKLY } });
+
+    const saveBtn = screen.getByRole('button', { name: /save changes/i });
+    fireEvent.click(saveBtn);
+
+    expect(onUpdate).toHaveBeenCalledWith(
+      'task-123',
+      expect.objectContaining({
+        recurrenceRule: expect.objectContaining({
+          frequency: RecurrenceFrequency.WEEKLY,
+        }),
+      }),
+    );
   });
 
   it('cancels edit mode on Escape key without invoking onUpdate', () => {
@@ -194,6 +268,7 @@ describe('TaskItem & Inline Editing', () => {
       description: null,
       todoDate: null,
       deadline: '2026-10-10T23:59:59.000Z',
+      recurrenceRule: null,
     });
   });
 });
