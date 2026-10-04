@@ -1,0 +1,33 @@
+{
+  "name": "self-management-tool",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "db:up": "docker compose up -d postgres",
+    "db:down": "docker compose down",
+    "db:migrate": "npm run --workspace=@self/server migrate",
+    "dev:server": "npm run --workspace=@self/server dev",
+    "dev:client": "npm run --workspace=@self/client dev",
+    "typecheck": "npm run --workspaces --if-present typecheck",
+    "test": "npm run --workspaces --if-present test",
+    "build": "npm run --workspaces --if-present build",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.12.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.13.0",
+    "lerna": "^10.0.1",
+    "prettier": "^3.9.9",
+    "typescript": "^5.5.4",
+    "typescript-eslint": "^8.71.0"
+  }
+}

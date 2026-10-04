@@ -1,0 +1,64 @@
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { CreateTaskDto, UpdateTaskDto, TaskDto } from '@self/contracts';
+import { Selectable } from 'kysely';
+import { TaskTable } from '../database/types';
+import { TasksRepository } from './tasks.repository';
+
+@Injectable()
+export class TasksService {
+  constructor(private readonly repository: TasksRepository) {}
+
+  async findAll(): Promise<TaskDto[]> {
+    const rows = await this.repository.findAll();
+    return rows.map((row) => this.toDto(row));
+  }
+
+  async findById(id: string): Promise<TaskDto> {
+    const row = await this.repository.findById(id);
+    if (!row) {
+      throw new NotFoundException(`Task with ID "${id}" not found`);
+    }
+    return this.toDto(row);
+  }
+
+  async create(dto: CreateTaskDto): Promise<TaskDto> {
+    const row = await this.repository.create({
+      title: dto.title,
+      description: dto.description,
+      due_date: dto.dueDate,
+    });
+    return this.toDto(row);
+  }
+
+  async update(id: string, dto: UpdateTaskDto): Promise<TaskDto> {
+    const row = await this.repository.update(id, {
+      title: dto.title,
+      description: dto.description,
+      is_completed: dto.isCompleted,
+      due_date: dto.dueDate,
+    });
+    if (!row) {
+      throw new NotFoundException(`Task with ID "${id}" not found`);
+    }
+    return this.toDto(row);
+  }
+
+  async delete(id: string): Promise<void> {
+    const deleted = await this.repository.delete(id);
+    if (!deleted) {
+      throw new NotFoundException(`Task with ID "${id}" not found`);
+    }
+  }
+
+  private toDto(row: Selectable<TaskTable>): TaskDto {
+    return {
+      id: row.id,
+      title: row.title,
+      description: row.description,
+      isCompleted: row.is_completed,
+      dueDate: row.due_date ? new Date(row.due_date).toISOString() : null,
+      createdAt: new Date(row.created_at).toISOString(),
+      updatedAt: new Date(row.updated_at).toISOString(),
+    };
+  }
+}
