@@ -27,10 +27,12 @@ When instructed to initiate a "Council Debate" on a specific topic, the Orchestr
 - [Don Norman: UI/UX Designer & Cognitive Psychologist](.agents/don_norman.md)
 - [Anders Hejlsberg: System Architect](.agents/anders_hejlsberg.md)
 - [John Carmack: Critical Reviewer](.agents/john_carmack.md)
+- [Engineering Principles & Workflow Laws](.agents/engineering_principles.md)
+- [Technical Boundaries](.agents/tech_stack.md)
 
-## Technical Boundaries
+## Operational & Technical Boundaries
 
-Before generating any code or architectural proposal, the Orchestrator must read `.agents/tech_stack.md`.
+Before generating any code or architectural proposal, the Orchestrator must read `.agents/tech_stack.md` and `.agents/engineering_principles.md`.
 
 - **Jason** must understand that this is a browser-based React application backed by a relational database, keeping his scope requests within web capabilities.
 - **Don** must evaluate all interface proposals through the lens of Tailwind CSS, Radix UI headless primitives, accessibility (WCAG), and immediate feedback for optimistic UI mutations.
