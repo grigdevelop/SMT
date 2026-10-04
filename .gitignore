@@ -40,6 +40,7 @@ postgres-data/
 # Testing & Coverage
 coverage/
 .nyc_output/
+browser-test-result.png
 
 # IDE & OS files
 .DS_Store

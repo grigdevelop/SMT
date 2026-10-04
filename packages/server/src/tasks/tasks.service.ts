@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Inject } from '@nestjs/common';
 import { CreateTaskDto, UpdateTaskDto, TaskDto } from '@self/contracts';
 import { Selectable } from 'kysely';
 import { TaskTable } from '../database/types';
@@ -6,7 +6,7 @@ import { TasksRepository } from './tasks.repository';
 
 @Injectable()
 export class TasksService {
-  constructor(private readonly repository: TasksRepository) {}
+  constructor(@Inject(TasksRepository) private readonly repository: TasksRepository) {}
 
   async findAll(): Promise<TaskDto[]> {
     const rows = await this.repository.findAll();

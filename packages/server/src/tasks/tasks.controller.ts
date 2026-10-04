@@ -8,6 +8,7 @@ import {
   Body,
   HttpCode,
   HttpStatus,
+  Inject,
 } from '@nestjs/common';
 import { CreateTaskSchema, UpdateTaskSchema } from '@self/contracts';
 import type { CreateTaskDto, UpdateTaskDto, TaskDto } from '@self/contracts';
@@ -16,7 +17,7 @@ import { TasksService } from './tasks.service';
 
 @Controller('tasks')
 export class TasksController {
-  constructor(private readonly tasksService: TasksService) {}
+  constructor(@Inject(TasksService) private readonly tasksService: TasksService) {}
 
   @Get()
   async findAll(): Promise<TaskDto[]> {

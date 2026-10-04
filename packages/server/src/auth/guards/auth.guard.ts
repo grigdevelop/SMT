@@ -1,4 +1,10 @@
-import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  UnauthorizedException,
+  Inject,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import crypto from 'node:crypto';
 import type { Role } from '@self/contracts';
@@ -13,8 +19,8 @@ export interface AuthenticatedUser {
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
-    private readonly jwtService: JwtService,
-    private readonly kysely: KyselyService,
+    @Inject(JwtService) private readonly jwtService: JwtService,
+    @Inject(KyselyService) private readonly kysely: KyselyService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {

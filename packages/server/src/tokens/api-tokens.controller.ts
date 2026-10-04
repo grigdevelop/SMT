@@ -8,6 +8,7 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
+  Inject,
 } from '@nestjs/common';
 import { CreateApiTokenSchema } from '@self/contracts';
 import type { CreateApiTokenDto, ApiTokenDto, CreatedApiTokenDto } from '@self/contracts';
@@ -20,7 +21,7 @@ import { ApiTokensService } from './api-tokens.service';
 @Controller('tokens')
 @UseGuards(AuthGuard)
 export class ApiTokensController {
-  constructor(private readonly tokensService: ApiTokensService) {}
+  constructor(@Inject(ApiTokensService) private readonly tokensService: ApiTokensService) {}
 
   @Post()
   async generateToken(

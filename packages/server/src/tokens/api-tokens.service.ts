@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Inject } from '@nestjs/common';
 import crypto from 'node:crypto';
 import type { CreateApiTokenDto, ApiTokenDto, CreatedApiTokenDto } from '@self/contracts';
 import { Selectable } from 'kysely';
@@ -7,7 +7,7 @@ import { ApiTokensRepository } from './api-tokens.repository';
 
 @Injectable()
 export class ApiTokensService {
-  constructor(private readonly repository: ApiTokensRepository) {}
+  constructor(@Inject(ApiTokensRepository) private readonly repository: ApiTokensRepository) {}
 
   async generateToken(userId: string, dto: CreateApiTokenDto): Promise<CreatedApiTokenDto> {
     const rawEntropy = crypto.randomBytes(32).toString('hex');

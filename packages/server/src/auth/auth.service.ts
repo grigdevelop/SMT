@@ -1,4 +1,4 @@
-import { Injectable, ConflictException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, ConflictException, UnauthorizedException, Inject } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import type { RegisterDto, LoginDto, AuthResponseDto, UserDto, Role } from '@self/contracts';
 import { Selectable } from 'kysely';
@@ -9,9 +9,9 @@ import { PasswordService } from './password.service';
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly usersRepository: UsersRepository,
-    private readonly passwordService: PasswordService,
-    private readonly jwtService: JwtService,
+    @Inject(UsersRepository) private readonly usersRepository: UsersRepository,
+    @Inject(PasswordService) private readonly passwordService: PasswordService,
+    @Inject(JwtService) private readonly jwtService: JwtService,
   ) {}
 
   async register(dto: RegisterDto): Promise<AuthResponseDto> {

@@ -1,4 +1,13 @@
-import { Controller, Post, Get, Body, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Body,
+  UseGuards,
+  HttpCode,
+  HttpStatus,
+  Inject,
+} from '@nestjs/common';
 import { RegisterSchema, LoginSchema, Role } from '@self/contracts';
 import type { RegisterDto, LoginDto, AuthResponseDto, UserDto } from '@self/contracts';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
@@ -11,7 +20,7 @@ import { Roles } from './decorators/roles.decorator';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(@Inject(AuthService) private readonly authService: AuthService) {}
 
   @Post('register')
   async register(

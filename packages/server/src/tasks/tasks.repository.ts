@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { Selectable } from 'kysely';
 import { KyselyService } from '../database/kysely.service';
 import { TaskTable } from '../database/types';
 
 @Injectable()
 export class TasksRepository {
-  constructor(private readonly kysely: KyselyService) {}
+  constructor(@Inject(KyselyService) private readonly kysely: KyselyService) {}
 
   async findAll(): Promise<Selectable<TaskTable>[]> {
     return this.kysely.db.selectFrom('tasks').selectAll().orderBy('created_at', 'desc').execute();

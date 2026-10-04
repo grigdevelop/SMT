@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { Selectable } from 'kysely';
 import { KyselyService } from '../database/kysely.service';
 import { UserTable } from '../database/types';
 
 @Injectable()
 export class UsersRepository {
-  constructor(private readonly kysely: KyselyService) {}
+  constructor(@Inject(KyselyService) private readonly kysely: KyselyService) {}
 
   async findByEmail(email: string): Promise<Selectable<UserTable> | undefined> {
     return this.kysely.db

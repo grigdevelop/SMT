@@ -71,3 +71,12 @@ All architectural debates and code generation must strictly adhere to the follow
   - Password hashing must use asynchronous routines (Argon2 or bcrypt) to prevent blocking the Node.js event loop.
   - Personal API Tokens (PAT) are generated with 32 bytes of entropy (`crypto.randomBytes(32)`), returned raw to the user once, and stored exclusively as SHA-256 hashes (`token_hash`) in PostgreSQL with a B-tree index.
 - **Tenant & Data Scoping:** All user-generated domain models (`tasks`, `habits`, `goals`) must include a foreign key reference to `users.id`. All Kysely queries must strictly filter by the authenticated `user_id`.
+
+## 10. Developer Tooling & PowerShell Utility Scripts
+
+- **Location:** All Windows lifecycle automation lives in `./scripts/` using PowerShell Core / Windows PowerShell (`.ps1`).
+- **Core Automation Suite:**
+  - `start-platform.ps1`: Boots Docker Postgres, polls container readiness (`pg_isready`), applies Kysely migrations, and launches backend & frontend concurrently with `concurrently -k`.
+  - `stop-platform.ps1`: Executes `docker compose down` and explicitly kills hanging listener processes on development ports `3000` and `5173` via `Get-NetTCPConnection`.
+  - `reset-db.ps1`: Wipes PostgreSQL Docker volumes (`down -v`), restarts fresh container, and re-runs all migrations on development and test databases.
+- **Execution Policy:** All script invocations in `package.json` must pass `-ExecutionPolicy Bypass` to guarantee frictionless execution on Windows environments.

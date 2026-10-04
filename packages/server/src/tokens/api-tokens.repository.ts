@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { Selectable } from 'kysely';
 import { KyselyService } from '../database/kysely.service';
 import { ApiTokenTable } from '../database/types';
 
 @Injectable()
 export class ApiTokensRepository {
-  constructor(private readonly kysely: KyselyService) {}
+  constructor(@Inject(KyselyService) private readonly kysely: KyselyService) {}
 
   async findByUserId(userId: string): Promise<Selectable<ApiTokenTable>[]> {
     return this.kysely.db
