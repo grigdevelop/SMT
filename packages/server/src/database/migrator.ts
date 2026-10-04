@@ -2,6 +2,7 @@ import { Kysely, PostgresDialect, Migrator, MigrationProvider, Migration } from 
 import pg from 'pg';
 import * as dotenv from 'dotenv';
 import * as migration001 from './migrations/001_create_tasks';
+import * as migration002 from './migrations/002_create_users_and_api_tokens';
 
 dotenv.config();
 
@@ -9,6 +10,7 @@ const { Pool } = pg;
 
 export const migrations: Record<string, Migration> = {
   '001_create_tasks': migration001,
+  '002_create_users_and_api_tokens': migration002,
 };
 
 export class MemoryMigrationProvider implements MigrationProvider {

@@ -3,7 +3,6 @@ import { render, screen } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { TaskList } from './TaskList';
 import { api } from '../../lib/api';
-import React from 'react';
 
 vi.spyOn(api.tasks, 'list').mockResolvedValue([]);
 

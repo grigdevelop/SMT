@@ -62,3 +62,12 @@ All architectural debates and code generation must strictly adhere to the follow
 - **Code Quality & Linting:** **ESLint 9 (Flat Config)** (`eslint.config.js`) enforces syntax safety, bug detection, React hook rules, and boundaries.
 - **Separation of Concerns:** `eslint-config-prettier` disables any conflicting stylistic ESLint rules. ESLint never formats; Prettier never lints.
 - **Performance Guardrail:** Fast AST/syntax linting. Type-checking remains strictly with `tsc --noEmit`.
+
+## 9. Authentication, RBAC & API Tokens
+
+- **Role Model (RBAC):** `ADMIN` and `USER` enums defined strictly in `@self/contracts`. Enforced declaratively via `@Roles(Role.ADMIN)` and NestJS `RolesGuard`.
+- **Guard Architecture:** Native NestJS `AuthGuard` implementing `CanActivate`. No Passport.js wrappers. Verifies both interactive JWT Bearer tokens and programmatic API tokens (`smt_pat_*`).
+- **Cryptographic Security:**
+  - Password hashing must use asynchronous routines (Argon2 or bcrypt) to prevent blocking the Node.js event loop.
+  - Personal API Tokens (PAT) are generated with 32 bytes of entropy (`crypto.randomBytes(32)`), returned raw to the user once, and stored exclusively as SHA-256 hashes (`token_hash`) in PostgreSQL with a B-tree index.
+- **Tenant & Data Scoping:** All user-generated domain models (`tasks`, `habits`, `goals`) must include a foreign key reference to `users.id`. All Kysely queries must strictly filter by the authenticated `user_id`.
