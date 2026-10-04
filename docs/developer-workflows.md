@@ -80,3 +80,14 @@ npm run db:reset
 | **Run All Tests**    | `npm run test`          | Runs Vitest across contracts, client, and server         |
 | **Format Code**      | `npm run format`        | Prettier formats all repository files in-place           |
 | **Lint Code**        | `npm run lint`          | ESLint 9 Flat Config static analysis                     |
+
+---
+
+## 4. Continuous Integration (CI) on GitHub Actions ($0 Free Tier)
+
+All pushes and pull requests targeting `main` automatically trigger `.github/workflows/ci.yml`.
+
+- **Runner:** `ubuntu-latest` (fastest, lowest minute consumption).
+- **Service Container:** Native Docker `postgres:16-alpine` service container with automated health check (`pg_isready`).
+- **Pipeline:** Runs `npm ci` with caching, Prettier formatting check, ESLint analysis, TypeScript typechecking across all workspaces, Kysely database migrations against the test database, Vitest test suite, and production monorepo artifact builds in a single sequential job (~40-50s run time).
+- **Zero Cost:** Uses standard GitHub Actions free tier allowance with zero external paid third-party dependencies.

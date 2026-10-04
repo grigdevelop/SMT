@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Lint, Typecheck, Test & Build
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: self_mgmt_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 2s
+          --health-retries 5
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Check Code Formatting (Prettier)
+        run: npm run format:check
+
+      - name: Static Code Analysis (ESLint)
+        run: npm run lint
+
+      - name: TypeScript Typecheck
+        run: npm run typecheck
+
+      - name: Apply Database Migrations (Test DB)
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/self_mgmt_test
+        run: npm run db:migrate
+
+      - name: Run Test Suite (Unit & Database E2E)
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/self_mgmt_test
+          JWT_SECRET: test-ci-secret-value-32chars-minimum-here
+        run: npm test
+
+      - name: Build Monorepo Artifacts
+        run: npm run build
