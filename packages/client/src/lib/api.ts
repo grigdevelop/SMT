@@ -41,6 +41,14 @@ function getHeaders(customHeaders: Record<string, string> = {}): HeadersInit {
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
   }
+  try {
+    const simulatedDate = sessionStorage.getItem('smt_simulated_date');
+    if (simulatedDate) {
+      headers['x-simulated-date'] = simulatedDate;
+    }
+  } catch {
+    // SessionStorage might be unavailable
+  }
   return headers;
 }
 

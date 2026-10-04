@@ -4,12 +4,14 @@ import { AuthPage } from './features/auth/AuthPage';
 import { ProtectedRoute } from './features/auth/ProtectedRoute';
 import { useAuth } from './features/auth/AuthContext';
 import { CheckSquare, LogOut, User as UserIcon } from 'lucide-react';
+import { DevTimeMachine } from './components/DevTimeMachine';
 
 function Dashboard() {
   const { user, logout } = useAuth();
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
+      <DevTimeMachine />
       {/* Top Header */}
       <header className="border-b border-slate-200 bg-white shadow-xs">
         <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">

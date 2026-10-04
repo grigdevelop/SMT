@@ -6,6 +6,8 @@ export interface TaskTable {
   title: string;
   description: string | null;
   is_completed: Generated<boolean>;
+  todo_date: string | null;
+  deadline: string | null;
   due_date: string | null;
   created_at: Generated<string>;
   updated_at: Generated<string>;

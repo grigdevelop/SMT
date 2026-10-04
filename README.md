@@ -49,7 +49,7 @@ npm run db:reset
 .\scripts\reset-db.ps1
 ```
 
-For full details, see the [Developer Workflows Guide](docs/developer-workflows.md).
+For full details, see the [Developer Workflows Guide](docs/guides/developer-workflows.md).
 
 ---
 

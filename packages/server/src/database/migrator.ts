@@ -4,6 +4,7 @@ import * as dotenv from 'dotenv';
 import * as migration001 from './migrations/001_create_tasks';
 import * as migration002 from './migrations/002_create_users_and_api_tokens';
 import * as migration003 from './migrations/003_add_user_id_to_tasks';
+import * as migration004 from './migrations/004_add_deadline_and_todo_date_to_tasks';
 
 dotenv.config();
 
@@ -13,6 +14,7 @@ export const migrations: Record<string, Migration> = {
   '001_create_tasks': migration001,
   '002_create_users_and_api_tokens': migration002,
   '003_add_user_id_to_tasks': migration003,
+  '004_add_deadline_and_todo_date_to_tasks': migration004,
 };
 
 export class MemoryMigrationProvider implements MigrationProvider {

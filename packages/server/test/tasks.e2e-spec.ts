@@ -181,4 +181,95 @@ describe('Tasks API Integration (User Scoping, AuthGuard & Multi-Tenancy)', () =
     expect(aliceList.body).toHaveLength(1);
     expect(aliceList.body[0].title).toBe('Alice Private Strategy');
   });
+
+  describe('Two-Date Model (todoDate vs deadline) & Execution Guard', () => {
+    it('creates a task with todoDate and deadline, verifying persistence and DTO', async () => {
+      const { accessToken } = await createTestUser('carmack@example.com');
+      const payload = {
+        title: 'Optimize Render Pipeline',
+        todoDate: '2026-10-15',
+        deadline: '2026-10-20T12:00:00.000Z',
+      };
+
+      const res = await request(app.getHttpServer())
+        .post('/api/tasks')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send(payload)
+        .expect(201);
+
+      expect(res.body.title).toBe('Optimize Render Pipeline');
+      expect(res.body.todoDate).toBe('2026-10-15');
+      expect(res.body.deadline).toBe('2026-10-20T12:00:00.000Z');
+
+      // Verify in DB
+      const inDb = await kysely.db
+        .selectFrom('tasks')
+        .selectAll()
+        .where('id', '=', res.body.id)
+        .executeTakeFirst();
+
+      expect(inDb).toBeDefined();
+      expect(inDb?.todo_date).toBeDefined();
+    });
+
+    it('rejects completing a task before its scheduled todoDate (Only-When rule)', async () => {
+      const { accessToken } = await createTestUser('norman@example.com');
+
+      // Task scheduled for future date
+      const createRes = await request(app.getHttpServer())
+        .post('/api/tasks')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({
+          title: 'Prepare Lecture Slides',
+          todoDate: '2026-12-01',
+        })
+        .expect(201);
+
+      const taskId = createRes.body.id;
+
+      // Attempting to complete before scheduled date (using reference date 2026-10-04)
+      const patchRes = await request(app.getHttpServer())
+        .patch(`/api/tasks/${taskId}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .set('x-simulated-date', '2026-10-04')
+        .send({ isCompleted: true })
+        .expect(400);
+
+      expect(patchRes.body.message).toMatch(/Cannot complete task before its scheduled date/);
+
+      // Verify task remains incomplete in DB
+      const inDb = await kysely.db
+        .selectFrom('tasks')
+        .selectAll()
+        .where('id', '=', taskId)
+        .executeTakeFirst();
+
+      expect(inDb?.is_completed).toBe(false);
+    });
+
+    it('permits completing the task once the scheduled todoDate is reached', async () => {
+      const { accessToken } = await createTestUser('anders@example.com');
+
+      const createRes = await request(app.getHttpServer())
+        .post('/api/tasks')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({
+          title: 'Publish TypeScript 6.0',
+          todoDate: '2026-10-10',
+        })
+        .expect(201);
+
+      const taskId = createRes.body.id;
+
+      // Simulate date travel to 2026-10-10
+      const patchRes = await request(app.getHttpServer())
+        .patch(`/api/tasks/${taskId}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .set('x-simulated-date', '2026-10-10')
+        .send({ isCompleted: true })
+        .expect(200);
+
+      expect(patchRes.body.isCompleted).toBe(true);
+    });
+  });
 });

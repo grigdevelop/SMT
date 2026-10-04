@@ -10,6 +10,7 @@ import {
   HttpStatus,
   Inject,
   UseGuards,
+  Headers,
 } from '@nestjs/common';
 import { CreateTaskSchema, UpdateTaskSchema } from '@self/contracts';
 import type { CreateTaskDto, UpdateTaskDto, TaskDto } from '@self/contracts';
@@ -50,8 +51,9 @@ export class TasksController {
     @CurrentUser() user: AuthenticatedUser,
     @Param('id') id: string,
     @Body(new ZodValidationPipe(UpdateTaskSchema)) dto: UpdateTaskDto,
+    @Headers('x-simulated-date') simulatedDate?: string,
   ): Promise<TaskDto> {
-    return this.tasksService.update(id, user.id, dto);
+    return this.tasksService.update(id, user.id, dto, simulatedDate);
   }
 
   @Delete(':id')

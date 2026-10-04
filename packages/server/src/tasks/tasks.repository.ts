@@ -30,6 +30,8 @@ export class TasksRepository {
     data: {
       title: string;
       description?: string | null;
+      todo_date?: string | null;
+      deadline?: string | null;
       due_date?: string | null;
     },
   ): Promise<Selectable<TaskTable>> {
@@ -39,6 +41,8 @@ export class TasksRepository {
         user_id: userId,
         title: data.title,
         description: data.description ?? null,
+        todo_date: data.todo_date ?? null,
+        deadline: data.deadline ?? null,
         due_date: data.due_date ?? null,
       })
       .returningAll()
@@ -52,6 +56,8 @@ export class TasksRepository {
       title?: string;
       description?: string | null;
       is_completed?: boolean;
+      todo_date?: string | null;
+      deadline?: string | null;
       due_date?: string | null;
     },
   ): Promise<Selectable<TaskTable> | undefined> {
