@@ -91,3 +91,25 @@ To test and verify temporal states (`UPCOMING`, `TODAY`, `OVERDUE`) without alte
 - State is managed via `DateProvider` (`packages/client/src/lib/date-context.tsx`).
 - Simulates any arbitrary reference date (`YYYY-MM-DD`) with quick jump shortcuts (`+1d`, `-1d`, `+1w`, `Reset to Real Today`).
 - All status badge calculations throughout the UI react immediately to the simulated reference date.
+
+---
+
+## 6. Inline Task Editing
+
+To prevent context-switching and cognitive overhead, tasks are edited directly in-place within the list without dialog modals or route navigations:
+
+### 6.1 Affordances & Signifiers (Don Norman)
+
+- **Edit Trigger:** Hovering or focusing a task reveals a distinct pencil icon button. Clicking either the title text or the pencil flips the row into edit mode.
+- **Auto-Focus:** The title text input automatically receives focus and text selection upon entering edit mode, allowing instant modifications without extra clicks.
+- **Active State Signifier:** The editing card is highlighted with an indigo border and subtle accent ring (`border-indigo-200 ring-2 ring-indigo-50 shadow-xs`).
+- **Date Controls:** Dedicated date pickers for `todoDate` (Execution) and `deadline` (Cutoff) include quick-action buttons (`Today`, `+1d`, and `Clear`) to remove or shift dates effortlessly.
+- **Save & Cancel Signifiers:** High-contrast `Save Changes` button (disabled if title is blank), explicit `Cancel` button, and standard keyboard shortcuts (`Enter` to submit, `Escape` to discard).
+
+### 6.2 Zero-Rerender Render Isolation (John Carmack)
+
+- `isEditing` state is encapsulated strictly within the localized `<TaskItem />` component. Typing keystrokes into the edit form triggers renders only for that single item, leaving sibling list items untouched.
+
+### 6.3 Optimistic Updates (Anders Hejlsberg)
+
+- Mutations use TanStack Query's `useUpdateTask()` hook. Updates apply to the local query cache immediately on mutation launch (0ms visual latency) and automatically revert if the server rejects the request.

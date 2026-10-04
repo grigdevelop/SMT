@@ -1,18 +1,8 @@
 import React, { useState } from 'react';
-import { useTasks, useCreateTask, useToggleTask, useDeleteTask } from './use-tasks';
+import { useTasks, useCreateTask, useToggleTask, useDeleteTask, useUpdateTask } from './use-tasks';
 import { useCurrentDate } from '../../lib/date-context';
-import { getTaskStatus, TaskStatus } from '@self/contracts';
-import {
-  Check,
-  Trash2,
-  Plus,
-  Loader2,
-  Lock,
-  Calendar,
-  Clock,
-  AlertCircle,
-  CalendarDays,
-} from 'lucide-react';
+import { TaskItem } from './TaskItem';
+import { Plus, Loader2, Calendar, Clock, CalendarDays } from 'lucide-react';
 
 export function TaskList() {
   const [title, setTitle] = useState('');
@@ -24,6 +14,7 @@ export function TaskList() {
   const { data: tasks = [], isLoading, error } = useTasks();
   const createTask = useCreateTask();
   const toggleTask = useToggleTask();
+  const updateTask = useUpdateTask();
   const deleteTask = useDeleteTask();
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -170,113 +161,16 @@ export function TaskList() {
             No tasks yet. Add your first task above.
           </div>
         ) : (
-          tasks.map((task) => {
-            const status = getTaskStatus(task, currentDate);
-            const isUpcoming = status === TaskStatus.UPCOMING;
-            const isOverdue = status === TaskStatus.OVERDUE;
-
-            return (
-              <div
-                key={task.id}
-                className={`flex items-center justify-between p-3.5 rounded-lg border transition group ${
-                  task.isCompleted
-                    ? 'border-slate-100 bg-slate-50/50'
-                    : isOverdue
-                      ? 'border-rose-200 bg-rose-50/30 hover:border-rose-300'
-                      : isUpcoming
-                        ? 'border-amber-200/70 bg-amber-50/20 hover:border-amber-300'
-                        : 'border-slate-200 bg-white hover:border-slate-300'
-                }`}
-              >
-                <div className="flex items-center gap-3 flex-1 min-w-0">
-                  {/* Completion Toggle button or Locked signifier */}
-                  {isUpcoming ? (
-                    <button
-                      type="button"
-                      disabled
-                      title={`Scheduled for ${task.todoDate}. Cannot be completed before its scheduled date.`}
-                      className="w-5 h-5 rounded border border-amber-300 bg-amber-100/60 flex items-center justify-center text-amber-700 cursor-not-allowed shrink-0"
-                    >
-                      <Lock className="w-3 h-3" />
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() =>
-                        toggleTask.mutate({ id: task.id, isCompleted: !task.isCompleted })
-                      }
-                      aria-label={task.isCompleted ? 'Mark incomplete' : 'Mark complete'}
-                      className={`w-5 h-5 rounded border flex items-center justify-center transition-colors cursor-pointer shrink-0 ${
-                        task.isCompleted
-                          ? 'bg-emerald-500 border-emerald-500 text-white'
-                          : 'border-slate-300 hover:border-slate-400 bg-white'
-                      }`}
-                    >
-                      {task.isCompleted && <Check className="w-3.5 h-3.5 stroke-[3]" />}
-                    </button>
-                  )}
-
-                  {/* Task Title & Details */}
-                  <div className="flex flex-col min-w-0">
-                    <span
-                      className={`text-sm truncate transition-all ${
-                        task.isCompleted ? 'line-through text-slate-400' : 'text-slate-800'
-                      }`}
-                    >
-                      {task.title}
-                    </span>
-
-                    {/* Date / Status Badges */}
-                    <div className="flex items-center gap-2 mt-1">
-                      {isOverdue && !task.isCompleted && (
-                        <span className="inline-flex items-center gap-1 text-2xs px-1.5 py-0.5 rounded bg-rose-100 text-rose-800 font-semibold border border-rose-200">
-                          <AlertCircle className="w-3 h-3 text-rose-600" />
-                          Out of Date / Overdue
-                        </span>
-                      )}
-
-                      {isUpcoming && (
-                        <span className="inline-flex items-center gap-1 text-2xs px-1.5 py-0.5 rounded bg-amber-100 text-amber-900 font-medium border border-amber-200">
-                          <Clock className="w-3 h-3 text-amber-700" />
-                          Upcoming ({task.todoDate})
-                        </span>
-                      )}
-
-                      {task.todoDate && !isUpcoming && (
-                        <span className="text-2xs text-slate-500 flex items-center gap-1">
-                          <CalendarDays className="w-3 h-3 text-slate-400" />
-                          Todo: {task.todoDate}
-                        </span>
-                      )}
-
-                      {task.deadline && (
-                        <span
-                          className={`text-2xs flex items-center gap-1 ${
-                            isOverdue && !task.isCompleted
-                              ? 'text-rose-700 font-medium'
-                              : 'text-slate-500'
-                          }`}
-                        >
-                          <Clock className="w-3 h-3 opacity-70" />
-                          Cutoff: {task.deadline.slice(0, 10)}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Delete action */}
-                <button
-                  type="button"
-                  onClick={() => deleteTask.mutate(task.id)}
-                  aria-label="Delete task"
-                  className="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-red-500 p-1.5 rounded transition cursor-pointer shrink-0 ml-2"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
-            );
-          })
+          tasks.map((task) => (
+            <TaskItem
+              key={task.id}
+              task={task}
+              currentDate={currentDate}
+              onToggle={(id, isCompleted) => toggleTask.mutate({ id, isCompleted })}
+              onDelete={(id) => deleteTask.mutate(id)}
+              onUpdate={(id, dto) => updateTask.mutate({ id, dto })}
+            />
+          ))
         )}
       </div>
     </div>
