@@ -24,6 +24,20 @@ describe('Task Contracts (Zod Validation & Status Lifecycle)', () => {
       expect(CreateTaskSchema.safeParse({ title: 'a'.repeat(256) }).success).toBe(false);
     });
 
+    it('accepts description up to 5000 chars and rejects over 5000 chars', () => {
+      const valid = CreateTaskSchema.safeParse({
+        title: 'Task',
+        description: 'a'.repeat(5000),
+      });
+      expect(valid.success).toBe(true);
+
+      const invalid = CreateTaskSchema.safeParse({
+        title: 'Task',
+        description: 'a'.repeat(5001),
+      });
+      expect(invalid.success).toBe(false);
+    });
+
     it('validates valid civil todoDate format (YYYY-MM-DD)', () => {
       const valid = CreateTaskSchema.safeParse({ title: 'Task', todoDate: '2026-10-10' });
       expect(valid.success).toBe(true);

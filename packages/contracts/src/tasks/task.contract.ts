@@ -17,7 +17,7 @@ export const CreateTaskSchema = z.object({
   description: z
     .string()
     .trim()
-    .max(1000, 'Description must be 1000 characters or less')
+    .max(5000, 'Description must be 5000 characters or less')
     .optional(),
   todoDate: z
     .string()
@@ -31,7 +31,7 @@ export type CreateTaskDto = z.infer<typeof CreateTaskSchema>;
 
 export const UpdateTaskSchema = z.object({
   title: z.string().trim().min(1).max(255).optional(),
-  description: z.string().trim().max(1000).nullable().optional(),
+  description: z.string().trim().max(5000).nullable().optional(),
   isCompleted: z.boolean().optional(),
   todoDate: z
     .string()

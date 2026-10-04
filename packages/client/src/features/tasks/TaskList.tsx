@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { useTasks, useCreateTask, useToggleTask, useDeleteTask, useUpdateTask } from './use-tasks';
 import { useCurrentDate } from '../../lib/date-context';
 import { TaskItem } from './TaskItem';
-import { Plus, Loader2, Calendar, Clock, CalendarDays } from 'lucide-react';
+import { Plus, Loader2, Calendar, Clock, CalendarDays, FileText } from 'lucide-react';
 
 export function TaskList() {
   const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
   const [todoDate, setTodoDate] = useState('');
   const [deadline, setDeadline] = useState('');
-  const [showDateControls, setShowDateControls] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
 
   const { currentDate } = useCurrentDate();
   const { data: tasks = [], isLoading, error } = useTasks();
@@ -25,15 +26,17 @@ export function TaskList() {
     createTask.mutate(
       {
         title: trimmed,
+        description: description.trim() ? description.trim() : undefined,
         todoDate: todoDate || undefined,
         deadline: deadline ? `${deadline}T23:59:59.000Z` : undefined,
       },
       {
         onSuccess: () => {
           setTitle('');
+          setDescription('');
           setTodoDate('');
           setDeadline('');
-          setShowDateControls(false);
+          setShowDetails(false);
         },
       },
     );
@@ -76,16 +79,16 @@ export function TaskList() {
           />
           <button
             type="button"
-            onClick={() => setShowDateControls(!showDateControls)}
-            title="Set execution date or deadline"
+            onClick={() => setShowDetails(!showDetails)}
+            title="Set execution date, deadline, or notes"
             className={`px-3 py-2.5 border rounded-lg text-xs font-medium flex items-center gap-1.5 transition cursor-pointer ${
-              showDateControls || todoDate || deadline
+              showDetails || todoDate || deadline || description
                 ? 'bg-indigo-50 border-indigo-200 text-indigo-700'
                 : 'border-slate-200 hover:bg-slate-50 text-slate-600'
             }`}
           >
             <Calendar className="w-4 h-4" />
-            <span className="hidden sm:inline">Dates</span>
+            <span className="hidden sm:inline">Details</span>
           </button>
           <button
             type="submit"
@@ -97,48 +100,71 @@ export function TaskList() {
           </button>
         </div>
 
-        {/* Expandable Date Selectors */}
-        {showDateControls && (
-          <div className="pt-2 border-t border-slate-100 flex flex-wrap gap-4 text-xs">
-            <div className="flex items-center gap-2">
+        {/* Expandable Details Drawer */}
+        {showDetails && (
+          <div className="pt-2.5 border-t border-slate-100 space-y-3 text-xs">
+            {/* Optional Description Input */}
+            <div className="space-y-1">
               <label
-                htmlFor="todo-date-input"
-                className="text-slate-600 font-medium flex items-center gap-1"
+                htmlFor="new-task-description"
+                className="text-slate-600 font-medium flex items-center gap-1 text-2xs"
               >
-                <CalendarDays className="w-3.5 h-3.5 text-indigo-600" />
-                <span>Todo Date (Execution):</span>
+                <FileText className="w-3 h-3 text-indigo-600" />
+                <span>Notes / Description (Markdown):</span>
               </label>
-              <input
-                id="todo-date-input"
-                type="date"
-                value={todoDate}
-                onChange={(e) => setTodoDate(e.target.value)}
-                className="px-2 py-1 rounded border border-slate-200 bg-white font-mono text-slate-700 text-xs shadow-2xs focus:ring-1 focus:ring-indigo-500 focus:outline-hidden"
+              <textarea
+                id="new-task-description"
+                rows={2}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Optional detailed steps (- item), links, or code notes..."
+                maxLength={5000}
+                className="w-full p-2 rounded border border-slate-200 bg-slate-50/50 text-xs text-slate-800 placeholder-slate-400 font-mono focus:outline-hidden focus:ring-1 focus:ring-indigo-500 focus:bg-white resize-y"
               />
-              <button
-                type="button"
-                onClick={() => setTodoDate(currentDate)}
-                className="text-2xs text-indigo-600 hover:underline cursor-pointer"
-              >
-                Today
-              </button>
             </div>
 
-            <div className="flex items-center gap-2">
-              <label
-                htmlFor="deadline-input"
-                className="text-slate-600 font-medium flex items-center gap-1"
-              >
-                <Clock className="w-3.5 h-3.5 text-rose-600" />
-                <span>Deadline:</span>
-              </label>
-              <input
-                id="deadline-input"
-                type="date"
-                value={deadline}
-                onChange={(e) => setDeadline(e.target.value)}
-                className="px-2 py-1 rounded border border-slate-200 bg-white font-mono text-slate-700 text-xs shadow-2xs focus:ring-1 focus:ring-rose-500 focus:outline-hidden"
-              />
+            {/* Date Pickers */}
+            <div className="flex flex-wrap gap-4">
+              <div className="flex items-center gap-2">
+                <label
+                  htmlFor="todo-date-input"
+                  className="text-slate-600 font-medium flex items-center gap-1"
+                >
+                  <CalendarDays className="w-3.5 h-3.5 text-indigo-600" />
+                  <span>Todo Date (Execution):</span>
+                </label>
+                <input
+                  id="todo-date-input"
+                  type="date"
+                  value={todoDate}
+                  onChange={(e) => setTodoDate(e.target.value)}
+                  className="px-2 py-1 rounded border border-slate-200 bg-white font-mono text-slate-700 text-xs shadow-2xs focus:ring-1 focus:ring-indigo-500 focus:outline-hidden"
+                />
+                <button
+                  type="button"
+                  onClick={() => setTodoDate(currentDate)}
+                  className="text-2xs text-indigo-600 hover:underline cursor-pointer"
+                >
+                  Today
+                </button>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <label
+                  htmlFor="deadline-input"
+                  className="text-slate-600 font-medium flex items-center gap-1"
+                >
+                  <Clock className="w-3.5 h-3.5 text-rose-600" />
+                  <span>Deadline:</span>
+                </label>
+                <input
+                  id="deadline-input"
+                  type="date"
+                  value={deadline}
+                  onChange={(e) => setDeadline(e.target.value)}
+                  className="px-2 py-1 rounded border border-slate-200 bg-white font-mono text-slate-700 text-xs shadow-2xs focus:ring-1 focus:ring-rose-500 focus:outline-hidden"
+                />
+              </div>
             </div>
           </div>
         )}

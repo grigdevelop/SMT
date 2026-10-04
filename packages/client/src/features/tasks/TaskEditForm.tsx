@@ -1,7 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { TaskDto, UpdateTaskDto } from '@self/contracts';
-import { CalendarDays, Clock, Check, X } from 'lucide-react';
+import { CalendarDays, Clock, Check, X, FileText } from 'lucide-react';
 import { parseLocalDate, formatLocalDate } from '../../lib/date-context';
+import { MarkdownToolbar } from '../../components/MarkdownToolbar';
+import { MarkdownViewer } from '../../components/MarkdownViewer';
 
 export interface TaskEditFormProps {
   task: TaskDto;
@@ -19,9 +21,13 @@ export function TaskEditForm({
   isSaving = false,
 }: TaskEditFormProps) {
   const [title, setTitle] = useState(task.title);
+  const [description, setDescription] = useState(task.description ?? '');
+  const [descMode, setDescMode] = useState<'write' | 'preview'>('write');
   const [todoDate, setTodoDate] = useState(task.todoDate ?? '');
   const [deadline, setDeadline] = useState(task.deadline ? task.deadline.slice(0, 10) : '');
+
   const inputRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     // Focus and select text when opening edit mode for instant typing
@@ -39,11 +45,12 @@ export function TaskEditForm({
 
   const handleSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    const trimmed = title.trim();
-    if (!trimmed || isSaving) return;
+    const trimmedTitle = title.trim();
+    if (!trimmedTitle || isSaving) return;
 
     const dto: UpdateTaskDto = {
-      title: trimmed,
+      title: trimmedTitle,
+      description: description.trim() ? description.trim() : null,
       todoDate: todoDate ? todoDate : null,
       deadline: deadline ? `${deadline}T23:59:59.000Z` : null,
     };
@@ -55,7 +62,8 @@ export function TaskEditForm({
     if (e.key === 'Escape') {
       e.preventDefault();
       onCancel();
-    } else if (e.key === 'Enter') {
+    } else if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+      // Cmd/Ctrl+Enter submits form from textarea
       e.preventDefault();
       handleSubmit();
     }
@@ -85,6 +93,45 @@ export function TaskEditForm({
         />
         {isTitleEmpty && (
           <p className="text-2xs text-rose-600 mt-1 font-medium">Title cannot be empty</p>
+        )}
+      </div>
+
+      {/* Formatted Description Editor */}
+      <div className="rounded-md border border-slate-200 bg-slate-50/50 p-2.5 space-y-2">
+        <div className="flex items-center justify-between text-2xs font-medium text-slate-500">
+          <span className="flex items-center gap-1">
+            <FileText className="w-3.5 h-3.5 text-indigo-600" />
+            Description (Markdown notes, checklists, code):
+          </span>
+          <span className="text-slate-400">{description.length}/5000</span>
+        </div>
+
+        <MarkdownToolbar
+          textareaRef={textareaRef}
+          value={description}
+          onChange={setDescription}
+          mode={descMode}
+          onModeChange={setDescMode}
+        />
+
+        {descMode === 'write' ? (
+          <textarea
+            ref={textareaRef}
+            rows={3}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Add detailed notes, checklists (- item), or links ([text](url))..."
+            maxLength={5000}
+            className="w-full p-2 rounded border border-slate-200 bg-white text-xs text-slate-800 placeholder-slate-400 font-mono focus:outline-hidden focus:ring-1 focus:ring-indigo-500 focus:border-transparent resize-y"
+          />
+        ) : (
+          <div className="min-h-[72px] p-2.5 rounded border border-slate-200 bg-white">
+            {description.trim() ? (
+              <MarkdownViewer content={description} />
+            ) : (
+              <p className="text-xs text-slate-400 italic">No description content to preview.</p>
+            )}
+          </div>
         )}
       </div>
 

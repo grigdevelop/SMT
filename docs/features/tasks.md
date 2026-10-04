@@ -113,3 +113,25 @@ To prevent context-switching and cognitive overhead, tasks are edited directly i
 ### 6.3 Optimistic Updates (Anders Hejlsberg)
 
 - Mutations use TanStack Query's `useUpdateTask()` hook. Updates apply to the local query cache immediately on mutation launch (0ms visual latency) and automatically revert if the server rejects the request.
+
+---
+
+## 7. Formatted Task Descriptions (Markdown Notes)
+
+Tasks support rich, structured notes (checklists, code blocks, bold text, links) formatted with CommonMark / GFM syntax:
+
+### 7.1 Data Storage & Constraints
+
+- Persisted as plain text in PostgreSQL `description TEXT` (zero schema migration required).
+- Validation in `@self/contracts` allows up to 5,000 characters (`z.string().trim().max(5000)`).
+
+### 7.2 Cognitive Ergonomics & Formatting Toolbar (Don Norman)
+
+- **Formatting Toolbar (`MarkdownToolbar`):** Provides instant signifiers (`Bold`, `Italic`, `List`, `Code`, `Link`) above the description input, wrapping or inserting markdown syntax around the cursor selection.
+- **Write / Preview Tabs:** Allows toggling between the raw Markdown textarea and the rendered preview before saving.
+- **Collapsible List Notes:** In the main task list view, tasks with descriptions display a compact `Notes` badge. Clicking toggles an accordion card displaying the fully rendered Markdown notes without cluttering the initial scannable list view (Jason Fried).
+
+### 7.3 Performance & Security (John Carmack & Anders Hejlsberg)
+
+- **Lazy Rendering & Zero Parsing Overhead:** The `<MarkdownViewer />` component is only mounted when the notes section is expanded. Markdown parsing is memoized (`useMemo`) to avoid redundant parsing cycles during parent re-renders.
+- **XSS Sanitization:** Rendered HTML passes through `DOMPurify` with strict attribute whitelisting (`target="_blank"`, `rel="noopener noreferrer"` for links). Raw dangerous scripts or handlers are strictly stripped.
