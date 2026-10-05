@@ -2,10 +2,11 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { CheckSquare, Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react';
 import { LoginSchema, RegisterSchema } from '@self/contracts';
 import type { LoginDto, RegisterDto } from '@self/contracts';
 import { useAuth } from './AuthContext';
+import { BrandLogo } from '../../components/BrandLogo';
 
 interface AuthPageProps {
   mode: 'login' | 'register';
@@ -57,8 +58,8 @@ export function AuthPage({ mode }: AuthPageProps) {
     <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       {/* Brand Header */}
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-        <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-indigo-600 text-white shadow-sm mb-4">
-          <CheckSquare className="w-6 h-6" />
+        <div className="inline-flex items-center justify-center mb-4 shadow-sm rounded-xl">
+          <BrandLogo size="lg" />
         </div>
         <h1 className="text-2xl font-bold tracking-tight text-slate-900">
           {isLogin ? 'Welcome back' : 'Create your account'}

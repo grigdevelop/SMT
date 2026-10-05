@@ -5,8 +5,9 @@ import { AdminPage } from './features/admin/AdminPage';
 import { AuthPage } from './features/auth/AuthPage';
 import { ProtectedRoute } from './features/auth/ProtectedRoute';
 import { useAuth } from './features/auth/AuthContext';
-import { CheckSquare, LogOut, User as UserIcon } from 'lucide-react';
+import { LogOut, User as UserIcon } from 'lucide-react';
 import { DevTimeMachine } from './components/DevTimeMachine';
+import { BrandLogo } from './components/BrandLogo';
 import { Role } from '@self/contracts';
 
 interface DashboardProps {
@@ -25,9 +26,7 @@ function Dashboard({ view }: DashboardProps) {
           {/* Logo & Brand & Navigation */}
           <div className="flex items-center gap-2 sm:gap-4">
             <div className="flex items-center space-x-1.5 sm:space-x-2 shrink-0">
-              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white">
-                <CheckSquare className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-              </div>
+              <BrandLogo className="w-7 h-7 sm:w-8 sm:h-8" />
               <span className="font-semibold text-slate-800 text-xs sm:text-sm tracking-tight hidden xs:inline">
                 Self Management
               </span>
