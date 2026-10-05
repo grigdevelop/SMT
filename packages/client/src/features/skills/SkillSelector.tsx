@@ -90,19 +90,21 @@ export function SkillSelector({ selectedSkillIds, onChange, maxSkills = 10 }: Sk
   return (
     <div ref={containerRef} className="space-y-1.5 text-xs">
       <div className="flex items-center justify-between">
-        <label className="text-slate-600 font-medium flex items-center gap-1 text-2xs">
-          <Sparkles className="w-3 h-3 text-indigo-600" />
+        <label className="text-muted-foreground font-medium flex items-center gap-1 text-2xs">
+          <Sparkles className="w-3 h-3 text-primary" />
           <span>Cultivated Skills (Max {maxSkills}):</span>
         </label>
         {isAtLimit && (
-          <span className="text-2xs text-amber-600 font-medium">Limit of {maxSkills} reached</span>
+          <span className="text-2xs text-amber-600 dark:text-amber-400 font-medium">
+            Limit of {maxSkills} reached
+          </span>
         )}
       </div>
 
       {/* Selected skill chips */}
       <div
         ref={chipsRef}
-        className="flex flex-wrap items-center gap-1.5 min-h-[28px] p-1.5 rounded-md border border-slate-200 bg-white shadow-2xs"
+        className="flex flex-wrap items-center gap-1.5 min-h-[28px] p-1.5 rounded-md border border-border bg-card shadow-2xs"
       >
         {selectedSkills.map((skill) => (
           <span
@@ -147,7 +149,7 @@ export function SkillSelector({ selectedSkillIds, onChange, maxSkills = 10 }: Sk
                   ? 'Tag skills (e.g. Math, Coding)...'
                   : 'Add another skill...'
               }
-              className="w-full text-base sm:text-2xs px-1 py-0.5 text-slate-800 placeholder-slate-400 focus:outline-hidden bg-transparent"
+              className="w-full text-base sm:text-2xs px-1 py-0.5 text-foreground placeholder-muted-foreground focus:outline-hidden bg-transparent"
             />
           </div>
         )}
@@ -156,13 +158,13 @@ export function SkillSelector({ selectedSkillIds, onChange, maxSkills = 10 }: Sk
       {/* Autocomplete / Suggestions Popover */}
       {isOpen && !isAtLimit && (
         <div className="relative">
-          <div className="absolute z-30 left-0 right-0 mt-1 max-h-48 overflow-y-auto bg-white border border-slate-200 rounded-lg shadow-lg py-1 text-xs">
+          <div className="absolute z-30 left-0 right-0 mt-1 max-h-48 overflow-y-auto bg-card border border-border rounded-lg shadow-lg py-1 text-xs">
             {isLoading && (
-              <div className="px-3 py-2 text-slate-400 text-2xs">Loading skills...</div>
+              <div className="px-3 py-2 text-muted-foreground text-2xs">Loading skills...</div>
             )}
 
             {!isLoading && filteredSkills.length === 0 && !canCreate && (
-              <div className="px-3 py-2 text-slate-400 text-2xs italic">
+              <div className="px-3 py-2 text-muted-foreground text-2xs italic">
                 {skills.length === 0
                   ? 'No skills defined yet. Type a name to create one.'
                   : 'All matching skills are already selected.'}
@@ -174,16 +176,16 @@ export function SkillSelector({ selectedSkillIds, onChange, maxSkills = 10 }: Sk
                 key={skill.id}
                 type="button"
                 onClick={() => handleSelect(skill.id)}
-                className="w-full px-3 py-2 sm:py-1.5 text-left flex items-center justify-between hover:bg-slate-50 transition cursor-pointer"
+                className="w-full px-3 py-2 sm:py-1.5 text-left flex items-center justify-between hover:bg-accent hover:text-accent-foreground transition cursor-pointer"
               >
                 <div className="flex items-center gap-2">
                   <span
                     className="w-2 h-2 rounded-full shrink-0"
                     style={{ backgroundColor: skill.color }}
                   />
-                  <span className="text-slate-700 font-medium">{skill.name}</span>
+                  <span className="text-foreground font-medium">{skill.name}</span>
                 </div>
-                <span className="text-2xs text-slate-400">
+                <span className="text-2xs text-muted-foreground">
                   {skill.completedTaskCount} completed
                 </span>
               </button>
@@ -194,7 +196,7 @@ export function SkillSelector({ selectedSkillIds, onChange, maxSkills = 10 }: Sk
                 type="button"
                 onClick={handleCreate}
                 disabled={createSkill.isPending}
-                className="w-full px-3 py-2 sm:py-1.5 text-left border-t border-slate-100 flex items-center gap-2 hover:bg-indigo-50 text-indigo-700 transition cursor-pointer font-medium text-xs sm:text-2xs"
+                className="w-full px-3 py-2 sm:py-1.5 text-left border-t border-border flex items-center gap-2 hover:bg-primary/10 text-primary transition cursor-pointer font-medium text-xs sm:text-2xs"
               >
                 <Plus className="w-3.5 h-3.5 shrink-0" />
                 <span>Create skill "{query.trim()}"</span>

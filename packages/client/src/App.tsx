@@ -8,6 +8,8 @@ import { useAuth } from './features/auth/AuthContext';
 import { LogOut, User as UserIcon } from 'lucide-react';
 import { DevTimeMachine } from './components/DevTimeMachine';
 import { BrandLogo } from './components/BrandLogo';
+import { ThemeToggle } from './lib/theme-context';
+import { Button } from './components/ui/Button';
 import { Role } from '@self/contracts';
 
 interface DashboardProps {
@@ -18,29 +20,29 @@ function Dashboard({ view }: DashboardProps) {
   const { user, logout } = useAuth();
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
+    <div className="min-h-screen bg-background text-foreground flex flex-col transition-colors duration-150">
       <DevTimeMachine />
       {/* Top Header */}
-      <header className="border-b border-slate-200 bg-white shadow-xs">
+      <header className="border-b border-border bg-card/80 backdrop-blur-md shadow-2xs sticky top-0 z-30 transition-colors duration-150">
         <div className="max-w-4xl mx-auto px-3 sm:px-4 py-2.5 sm:py-3 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2.5 sm:gap-4">
           {/* Logo & Brand & Navigation */}
           <div className="flex items-center gap-2 sm:gap-4">
             <div className="flex items-center space-x-1.5 sm:space-x-2 shrink-0">
               <BrandLogo className="w-7 h-7 sm:w-8 sm:h-8" />
-              <span className="font-semibold text-slate-800 text-xs sm:text-sm tracking-tight hidden xs:inline">
+              <span className="font-semibold text-foreground text-xs sm:text-sm tracking-tight hidden xs:inline">
                 Self Management
               </span>
             </div>
 
-            <nav className="flex items-center space-x-1 text-xs font-medium text-slate-500">
+            <nav className="flex items-center space-x-1 text-xs font-medium text-muted-foreground">
               <NavLink
                 to="/"
                 end
                 className={({ isActive }) =>
                   `px-2.5 py-1.5 rounded-md transition ${
                     isActive
-                      ? 'text-indigo-600 font-semibold bg-indigo-50'
-                      : 'hover:text-slate-900 hover:bg-slate-100'
+                      ? 'text-indigo-600 dark:text-indigo-400 font-semibold bg-indigo-50 dark:bg-indigo-950/60'
+                      : 'hover:text-foreground hover:bg-muted'
                   }`
                 }
               >
@@ -51,8 +53,8 @@ function Dashboard({ view }: DashboardProps) {
                 className={({ isActive }) =>
                   `px-2.5 py-1.5 rounded-md transition ${
                     isActive
-                      ? 'text-indigo-600 font-semibold bg-indigo-50'
-                      : 'hover:text-slate-900 hover:bg-slate-100'
+                      ? 'text-indigo-600 dark:text-indigo-400 font-semibold bg-indigo-50 dark:bg-indigo-950/60'
+                      : 'hover:text-foreground hover:bg-muted'
                   }`
                 }
               >
@@ -64,8 +66,8 @@ function Dashboard({ view }: DashboardProps) {
                   className={({ isActive }) =>
                     `px-2.5 py-1.5 rounded-md transition ${
                       isActive
-                        ? 'text-indigo-600 font-semibold bg-indigo-50'
-                        : 'hover:text-slate-900 hover:bg-slate-100'
+                        ? 'text-indigo-600 dark:text-indigo-400 font-semibold bg-indigo-50 dark:bg-indigo-950/60'
+                        : 'hover:text-foreground hover:bg-muted'
                     }`
                   }
                 >
@@ -87,27 +89,30 @@ function Dashboard({ view }: DashboardProps) {
             </nav>
           </div>
 
-          {/* User Profile & Sign Out */}
+          {/* Theme Toggle, User Profile & Sign Out */}
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            <div className="flex items-center space-x-1.5 text-xs text-slate-600 bg-slate-100 py-1 px-2 sm:px-2.5 rounded-full font-medium">
-              <UserIcon className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+            <ThemeToggle />
+
+            <div className="flex items-center space-x-1.5 text-xs text-muted-foreground bg-muted py-1 px-2 sm:px-2.5 rounded-full font-medium">
+              <UserIcon className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
               <span
-                className="max-w-[100px] xs:max-w-[120px] sm:max-w-[160px] truncate"
+                className="max-w-[100px] xs:max-w-[120px] sm:max-w-[160px] truncate text-foreground"
                 title={user?.email}
               >
                 {user?.email}
               </span>
             </div>
 
-            <button
-              type="button"
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={logout}
               title="Sign out of your account"
-              className="flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-rose-600 active:scale-95 motion-reduce:transform-none transition-all duration-75 p-1.5 rounded-md cursor-pointer"
+              className="flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-rose-600 dark:hover:text-rose-400 p-1.5 rounded-md"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Sign out</span>
-            </button>
+            </Button>
           </div>
         </div>
       </header>
@@ -117,10 +122,10 @@ function Dashboard({ view }: DashboardProps) {
         {view === 'tasks' ? (
           <>
             <div className="mb-4 sm:mb-6 max-w-xl mx-auto text-left">
-              <h1 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">
+              <h1 className="text-lg sm:text-xl font-bold text-foreground tracking-tight">
                 Today's Tasks
               </h1>
-              <p className="text-xs text-slate-500 mt-0.5 sm:mt-1">
+              <p className="text-xs text-muted-foreground mt-0.5 sm:mt-1">
                 Focus on what matters most today. Instant updates, zero friction.
               </p>
             </div>

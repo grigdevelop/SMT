@@ -4,6 +4,7 @@ import type { TaskDto, UpdateTaskDto } from '@self/contracts';
 import { getTaskStatus, TaskStatus, formatRecurrenceLabel } from '@self/contracts';
 import { TaskEditForm } from './TaskEditForm';
 import { MarkdownViewer } from '../../components/MarkdownViewer';
+import { Badge, Button } from '../../components/ui';
 import {
   Check,
   Trash2,
@@ -71,19 +72,19 @@ export function TaskItem({ task, currentDate, onToggle, onDelete, onUpdate }: Ta
       ref={itemRef}
       className={`relative p-3.5 rounded-lg border transition-all duration-150 group ${
         task.isCompleted
-          ? 'border-slate-100 bg-slate-50/50'
+          ? 'border-border/60 bg-muted/40'
           : isOverdue
-            ? 'border-rose-200 bg-rose-50/30 hover:border-rose-300'
+            ? 'border-rose-300 dark:border-rose-900/60 bg-rose-50/50 dark:bg-rose-950/20 hover:border-rose-400'
             : isUpcoming
-              ? 'border-amber-200/70 bg-amber-50/20 hover:border-amber-300'
-              : 'border-slate-200 bg-white hover:border-slate-300'
+              ? 'border-amber-300 dark:border-amber-900/60 bg-amber-50/40 dark:bg-amber-950/20 hover:border-amber-400'
+              : 'border-border bg-card hover:border-slate-300 dark:hover:border-slate-700'
       }`}
     >
       {/* Floating Micro-Reward Feedback Pill */}
       {rewardVisible && task.skills && task.skills.length > 0 && (
         <div
           data-testid="micro-reward-pill"
-          className="absolute right-4 -top-3.5 z-20 flex items-center gap-1.5 shadow-md bg-white border border-indigo-200 px-2.5 py-1 rounded-full text-xs font-semibold animate-bounce motion-reduce:animate-none pointer-events-none"
+          className="absolute right-4 -top-3.5 z-20 flex items-center gap-1.5 shadow-md bg-card border border-indigo-200 dark:border-indigo-800 px-2.5 py-1 rounded-full text-xs font-semibold animate-bounce motion-reduce:animate-none pointer-events-none"
         >
           <Sparkles className="w-3.5 h-3.5 text-indigo-500" />
           {task.skills.map((s) => (
@@ -102,7 +103,7 @@ export function TaskItem({ task, currentDate, onToggle, onDelete, onUpdate }: Ta
               type="button"
               disabled
               title={`Scheduled for ${task.todoDate}. Cannot be completed before its scheduled date.`}
-              className="w-5 h-5 rounded border border-amber-300 bg-amber-100/60 flex items-center justify-center text-amber-700 cursor-not-allowed shrink-0"
+              className="w-5 h-5 rounded border border-amber-300 dark:border-amber-700 bg-amber-100/60 dark:bg-amber-950/60 flex items-center justify-center text-amber-700 dark:text-amber-300 cursor-not-allowed shrink-0"
             >
               <Lock className="w-3 h-3" />
             </button>
@@ -114,7 +115,7 @@ export function TaskItem({ task, currentDate, onToggle, onDelete, onUpdate }: Ta
               className={`w-6 h-6 sm:w-5 sm:h-5 rounded border flex items-center justify-center transition-all duration-100 active:scale-90 motion-reduce:transform-none cursor-pointer shrink-0 ${
                 task.isCompleted
                   ? 'bg-emerald-500 border-emerald-500 text-white'
-                  : 'border-slate-300 hover:border-slate-400 bg-white'
+                  : 'border-border hover:border-slate-400 bg-card'
               } ${justCompleted ? 'animate-checkmark-pop motion-reduce:animate-none' : ''}`}
             >
               {task.isCompleted && <Check className="w-3.5 h-3.5 stroke-[3]" />}
@@ -135,8 +136,8 @@ export function TaskItem({ task, currentDate, onToggle, onDelete, onUpdate }: Ta
             }}
           >
             <span
-              className={`text-sm truncate transition-all hover:text-indigo-600 ${
-                task.isCompleted ? 'line-through text-slate-400' : 'text-slate-800'
+              className={`text-sm truncate transition-colors duration-150 hover:text-indigo-600 dark:hover:text-indigo-400 ${
+                task.isCompleted ? 'line-through text-muted-foreground' : 'text-foreground'
               }`}
             >
               {task.title}
@@ -145,22 +146,22 @@ export function TaskItem({ task, currentDate, onToggle, onDelete, onUpdate }: Ta
             {/* Date / Status Badges */}
             <div className="flex items-center flex-wrap gap-2 mt-1">
               {isOverdue && !task.isCompleted && (
-                <span className="inline-flex items-center gap-1 text-2xs px-1.5 py-0.5 rounded bg-rose-100 text-rose-800 font-semibold border border-rose-200">
-                  <AlertCircle className="w-3 h-3 text-rose-600" />
+                <Badge variant="danger">
+                  <AlertCircle className="w-3 h-3 text-rose-600 dark:text-rose-400" />
                   Out of Date / Overdue
-                </span>
+                </Badge>
               )}
 
               {isUpcoming && (
-                <span className="inline-flex items-center gap-1 text-2xs px-1.5 py-0.5 rounded bg-amber-100 text-amber-900 font-medium border border-amber-200">
-                  <Clock className="w-3 h-3 text-amber-700" />
+                <Badge variant="warning">
+                  <Clock className="w-3 h-3 text-amber-700 dark:text-amber-400" />
                   Upcoming ({task.todoDate})
-                </span>
+                </Badge>
               )}
 
               {task.todoDate && !isUpcoming && (
-                <span className="text-2xs text-slate-500 flex items-center gap-1">
-                  <CalendarDays className="w-3 h-3 text-slate-400" />
+                <span className="text-2xs text-muted-foreground flex items-center gap-1">
+                  <CalendarDays className="w-3 h-3 text-muted-foreground" />
                   Todo: {task.todoDate}
                 </span>
               )}
@@ -168,7 +169,9 @@ export function TaskItem({ task, currentDate, onToggle, onDelete, onUpdate }: Ta
               {task.deadline && (
                 <span
                   className={`text-2xs flex items-center gap-1 ${
-                    isOverdue && !task.isCompleted ? 'text-rose-700 font-medium' : 'text-slate-500'
+                    isOverdue && !task.isCompleted
+                      ? 'text-rose-700 dark:text-rose-400 font-medium'
+                      : 'text-muted-foreground'
                   }`}
                 >
                   <Clock className="w-3 h-3 opacity-70" />
@@ -178,14 +181,14 @@ export function TaskItem({ task, currentDate, onToggle, onDelete, onUpdate }: Ta
 
               {/* Recurrence Badge */}
               {task.recurrenceRule && (
-                <span
+                <Badge
+                  variant="primary"
                   data-testid="recurrence-badge"
-                  className="inline-flex items-center gap-1 text-2xs px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 font-medium border border-indigo-200"
                   title={`Recurring task: ${formatRecurrenceLabel(task.recurrenceRule)}`}
                 >
                   <RotateCw className="w-3 h-3 text-indigo-500" />
                   <span>{formatRecurrenceLabel(task.recurrenceRule)}</span>
-                </span>
+                </Badge>
               )}
 
               {/* Associated Skill Badges */}
@@ -222,9 +225,9 @@ export function TaskItem({ task, currentDate, onToggle, onDelete, onUpdate }: Ta
                     setIsNotesExpanded(!isNotesExpanded);
                   }}
                   title={isNotesExpanded ? 'Collapse notes' : 'View formatted notes'}
-                  className="inline-flex items-center gap-1 text-2xs px-1.5 py-0.5 rounded bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-600 font-medium transition-all duration-75 motion-reduce:transform-none cursor-pointer"
+                  className="inline-flex items-center gap-1 text-2xs px-1.5 py-0.5 rounded bg-muted hover:bg-slate-200 dark:hover:bg-slate-700 text-muted-foreground hover:text-foreground font-medium transition-all duration-75 active:scale-95 motion-reduce:transform-none cursor-pointer"
                 >
-                  <FileText className="w-3 h-3 text-indigo-600" />
+                  <FileText className="w-3 h-3 text-indigo-600 dark:text-indigo-400" />
                   <span>Notes</span>
                   {isNotesExpanded ? (
                     <ChevronUp className="w-2.5 h-2.5" />
@@ -239,31 +242,33 @@ export function TaskItem({ task, currentDate, onToggle, onDelete, onUpdate }: Ta
 
         {/* Action buttons (Edit & Delete) */}
         <div className="flex items-center gap-0.5 sm:gap-1 ml-1 sm:ml-2 shrink-0">
-          <button
-            type="button"
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={() => setIsEditing(true)}
             aria-label="Edit task"
             title="Edit task"
-            className="text-slate-400 hover:text-indigo-600 active:scale-90 motion-reduce:transform-none sm:opacity-0 sm:group-hover:opacity-100 focus:opacity-100 p-1.5 rounded transition-all duration-75 cursor-pointer"
+            className="text-muted-foreground hover:text-indigo-600 dark:hover:text-indigo-400 sm:opacity-0 sm:group-hover:opacity-100 focus:opacity-100"
           >
             <Pencil className="w-3.5 h-3.5" />
-          </button>
-          <button
-            type="button"
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={() => onDelete(task.id)}
             aria-label="Delete task"
             title="Delete task"
-            className="text-slate-400 hover:text-rose-500 active:scale-90 motion-reduce:transform-none sm:opacity-0 sm:group-hover:opacity-100 focus:opacity-100 p-1.5 rounded transition-all duration-75 cursor-pointer"
+            className="text-muted-foreground hover:text-rose-500 dark:hover:text-rose-400 sm:opacity-0 sm:group-hover:opacity-100 focus:opacity-100"
           >
             <Trash2 className="w-3.5 h-3.5" />
-          </button>
+          </Button>
         </div>
       </div>
 
       {/* Expanded Formatted Markdown Notes */}
       {hasDescription && isNotesExpanded && (
-        <div className="mt-3 pt-2.5 border-t border-slate-100 pl-8 pr-2">
-          <div className="p-2.5 bg-slate-50/80 rounded-md border border-slate-200/80">
+        <div className="mt-3 pt-2.5 border-t border-border pl-8 pr-2">
+          <div className="p-2.5 bg-muted/40 rounded-md border border-border">
             <MarkdownViewer content={task.description!} />
           </div>
         </div>

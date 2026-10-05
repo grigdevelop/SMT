@@ -7,6 +7,9 @@ import { LoginSchema, RegisterSchema } from '@self/contracts';
 import type { LoginDto, RegisterDto } from '@self/contracts';
 import { useAuth } from './AuthContext';
 import { BrandLogo } from '../../components/BrandLogo';
+import { Button } from '../../components/ui';
+import { ThemeToggle } from '../../lib/theme-context';
+import { cn } from '../../lib/utils';
 
 interface AuthPageProps {
   mode: 'login' | 'register';
@@ -55,16 +58,21 @@ export function AuthPage({ mode }: AuthPageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="relative min-h-screen bg-background flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      {/* Floating Theme Toggle */}
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
+
       {/* Brand Header */}
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
         <div className="inline-flex items-center justify-center mb-4 shadow-sm rounded-xl">
           <BrandLogo size="lg" />
         </div>
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">
           {isLogin ? 'Welcome back' : 'Create your account'}
         </h1>
-        <p className="mt-1 text-sm text-slate-500">
+        <p className="mt-1 text-sm text-muted-foreground">
           {isLogin
             ? 'Sign in to access your daily tasks, habits, and goals'
             : 'Get started with zero-friction personal self-management'}
@@ -73,14 +81,14 @@ export function AuthPage({ mode }: AuthPageProps) {
 
       {/* Main Card */}
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 sm:px-10 shadow-sm border border-slate-200 rounded-xl">
+        <div className="bg-card py-8 px-4 sm:px-10 shadow-sm border border-border rounded-xl">
           {/* Server Error Alert Banner */}
           {serverError && (
             <div
               role="alert"
-              className="mb-6 p-3.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-800 text-sm flex items-start gap-2.5 animate-in fade-in duration-200"
+              className="mb-6 p-3.5 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm flex items-start gap-2.5 animate-in fade-in duration-200"
             >
-              <AlertCircle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
+              <AlertCircle className="w-5 h-5 text-destructive shrink-0 mt-0.5" />
               <div className="flex-1 font-medium">{serverError}</div>
             </div>
           )}
@@ -90,7 +98,7 @@ export function AuthPage({ mode }: AuthPageProps) {
             <div>
               <label
                 htmlFor="email"
-                className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5"
+                className="block text-xs font-semibold text-foreground uppercase tracking-wider mb-1.5"
               >
                 Email address
               </label>
@@ -100,14 +108,15 @@ export function AuthPage({ mode }: AuthPageProps) {
                 autoComplete="email"
                 placeholder="you@example.com"
                 {...formRegister('email')}
-                className={`block w-full px-3.5 py-2.5 text-base sm:text-sm rounded-lg border transition shadow-xs outline-hidden focus:ring-2 ${
+                className={cn(
+                  'block w-full px-3.5 py-2.5 text-base sm:text-sm rounded-lg border transition shadow-xs outline-hidden focus:ring-2 bg-card text-foreground placeholder-muted-foreground',
                   errors.email
-                    ? 'border-rose-300 focus:border-rose-500 focus:ring-rose-200 text-rose-900'
-                    : 'border-slate-300 focus:border-indigo-600 focus:ring-indigo-100 text-slate-900'
-                }`}
+                    ? 'border-destructive focus:border-destructive focus:ring-destructive/20 text-destructive'
+                    : 'border-border focus:border-primary focus:ring-primary/20',
+                )}
               />
               {errors.email && (
-                <p className="mt-1.5 text-xs text-rose-600 font-medium flex items-center gap-1">
+                <p className="mt-1.5 text-xs text-destructive font-medium flex items-center gap-1">
                   <span>•</span>
                   {errors.email.message}
                 </p>
@@ -119,11 +128,13 @@ export function AuthPage({ mode }: AuthPageProps) {
               <div className="flex items-center justify-between mb-1.5">
                 <label
                   htmlFor="password"
-                  className="block text-xs font-semibold text-slate-700 uppercase tracking-wider"
+                  className="block text-xs font-semibold text-foreground uppercase tracking-wider"
                 >
                   Password
                 </label>
-                {!isLogin && <span className="text-2xs text-slate-400">Min. 8 characters</span>}
+                {!isLogin && (
+                  <span className="text-2xs text-muted-foreground">Min. 8 characters</span>
+                )}
               </div>
               <div className="relative">
                 <input
@@ -132,23 +143,24 @@ export function AuthPage({ mode }: AuthPageProps) {
                   autoComplete={isLogin ? 'current-password' : 'new-password'}
                   placeholder="••••••••"
                   {...formRegister('password')}
-                  className={`block w-full px-3.5 py-2.5 pr-10 text-base sm:text-sm rounded-lg border transition shadow-xs outline-hidden focus:ring-2 ${
+                  className={cn(
+                    'block w-full px-3.5 py-2.5 pr-10 text-base sm:text-sm rounded-lg border transition shadow-xs outline-hidden focus:ring-2 bg-card text-foreground placeholder-muted-foreground',
                     errors.password
-                      ? 'border-rose-300 focus:border-rose-500 focus:ring-rose-200 text-rose-900'
-                      : 'border-slate-300 focus:border-indigo-600 focus:ring-indigo-100 text-slate-900'
-                  }`}
+                      ? 'border-destructive focus:border-destructive focus:ring-destructive/20 text-destructive'
+                      : 'border-border focus:border-primary focus:ring-primary/20',
+                  )}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 focus:outline-hidden"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground hover:text-foreground focus:outline-hidden"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
               {errors.password && (
-                <p className="mt-1.5 text-xs text-rose-600 font-medium flex items-center gap-1">
+                <p className="mt-1.5 text-xs text-destructive font-medium flex items-center gap-1">
                   <span>•</span>
                   {errors.password.message}
                 </p>
@@ -157,11 +169,7 @@ export function AuthPage({ mode }: AuthPageProps) {
 
             {/* Submit Button */}
             <div className="pt-2">
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full flex justify-center items-center py-2.5 px-4 border border-transparent rounded-lg shadow-xs text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] motion-reduce:transform-none focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-75 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
-              >
+              <Button type="submit" size="lg" disabled={isSubmitting} className="w-full">
                 {isSubmitting ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin mr-2" />
@@ -172,14 +180,14 @@ export function AuthPage({ mode }: AuthPageProps) {
                 ) : (
                   'Create account'
                 )}
-              </button>
+              </Button>
             </div>
           </form>
 
           {/* Toggle Login / Register */}
-          <div className="mt-6 pt-6 border-t border-slate-100 text-center">
+          <div className="mt-6 pt-6 border-t border-border text-center">
             {isLogin ? (
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-muted-foreground">
                 Don't have an account yet?{' '}
                 <Link
                   to="/register"
@@ -187,13 +195,13 @@ export function AuthPage({ mode }: AuthPageProps) {
                     setServerError(null);
                     reset();
                   }}
-                  className="font-semibold text-indigo-600 hover:text-indigo-500 transition"
+                  className="font-semibold text-primary hover:underline transition"
                 >
                   Create one now
                 </Link>
               </p>
             ) : (
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-muted-foreground">
                 Already have an account?{' '}
                 <Link
                   to="/login"
@@ -201,7 +209,7 @@ export function AuthPage({ mode }: AuthPageProps) {
                     setServerError(null);
                     reset();
                   }}
-                  className="font-semibold text-indigo-600 hover:text-indigo-500 transition"
+                  className="font-semibold text-primary hover:underline transition"
                 >
                   Sign in
                 </Link>
