@@ -181,13 +181,24 @@ describe('API Tokens & RBAC Integration (Real PostgreSQL & SHA-256)', () => {
     });
 
     it('allows ADMIN accessing ADMIN-only endpoint with 200 OK', async () => {
-      // ADMIN registration
+      // Register user then elevate to ADMIN in database
       const adminRes = await request(app.getHttpServer())
         .post('/api/auth/register')
-        .send({ email: 'admin@example.com', password: 'password123', role: 'ADMIN' })
+        .send({ email: 'admin@example.com', password: 'password123' })
         .expect(201);
 
-      const adminToken = adminRes.body.accessToken;
+      await kysely.db
+        .updateTable('users')
+        .set({ role: 'ADMIN' })
+        .where('id', '=', adminRes.body.user.id)
+        .execute();
+
+      const loginRes = await request(app.getHttpServer())
+        .post('/api/auth/login')
+        .send({ email: 'admin@example.com', password: 'password123' })
+        .expect(200);
+
+      const adminToken = loginRes.body.accessToken;
 
       // Access admin endpoint -> 200
       const okRes = await request(app.getHttpServer())

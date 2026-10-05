@@ -1,5 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { RegisterSchema, LoginSchema, CreateApiTokenSchema, Role } from './auth.contract';
+import {
+  RegisterSchema,
+  LoginSchema,
+  CreateApiTokenSchema,
+  UpdateUserRoleSchema,
+  Role,
+} from './auth.contract';
 
 describe('Auth Contracts (Zod Validation)', () => {
   describe('RegisterSchema', () => {
@@ -12,11 +18,10 @@ describe('Auth Contracts (Zod Validation)', () => {
       expect(result.success).toBe(true);
       if (result.success) {
         expect(result.data.email).toBe('user@example.com');
-        expect(result.data.role).toBe(Role.USER);
       }
     });
 
-    it('allows setting explicit ADMIN role', () => {
+    it('ignores any extraneous role passed in registration payload (privilege escalation prevention)', () => {
       const result = RegisterSchema.safeParse({
         email: 'admin@example.com',
         password: 'securepassword123',
@@ -25,7 +30,8 @@ describe('Auth Contracts (Zod Validation)', () => {
 
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.data.role).toBe(Role.ADMIN);
+        // Zod object strips keys not in schema
+        expect((result.data as Record<string, unknown>).role).toBeUndefined();
       }
     });
 
@@ -77,6 +83,19 @@ describe('Auth Contracts (Zod Validation)', () => {
     it('rejects empty name or names exceeding 100 characters', () => {
       expect(CreateApiTokenSchema.safeParse({ name: '   ' }).success).toBe(false);
       expect(CreateApiTokenSchema.safeParse({ name: 'a'.repeat(101) }).success).toBe(false);
+    });
+  });
+
+  describe('UpdateUserRoleSchema', () => {
+    it('validates ADMIN and USER roles', () => {
+      expect(UpdateUserRoleSchema.safeParse({ role: Role.ADMIN }).success).toBe(true);
+      expect(UpdateUserRoleSchema.safeParse({ role: Role.USER }).success).toBe(true);
+    });
+
+    it('rejects invalid or missing role values', () => {
+      expect(UpdateUserRoleSchema.safeParse({ role: 'SUPERADMIN' }).success).toBe(false);
+      expect(UpdateUserRoleSchema.safeParse({ role: '' }).success).toBe(false);
+      expect(UpdateUserRoleSchema.safeParse({}).success).toBe(false);
     });
   });
 });

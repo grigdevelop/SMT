@@ -24,7 +24,7 @@ export class AuthService {
     const user = await this.usersRepository.create({
       email: dto.email,
       password_hash: passwordHash,
-      role: dto.role,
+      role: 'USER',
     });
 
     const accessToken = await this.generateToken(user);

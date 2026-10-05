@@ -1,14 +1,16 @@
 import { Routes, Route, Navigate, NavLink } from 'react-router-dom';
 import { TaskList } from './features/tasks/TaskList';
 import { SkillsPage } from './features/skills/SkillsPage';
+import { AdminPage } from './features/admin/AdminPage';
 import { AuthPage } from './features/auth/AuthPage';
 import { ProtectedRoute } from './features/auth/ProtectedRoute';
 import { useAuth } from './features/auth/AuthContext';
 import { CheckSquare, LogOut, User as UserIcon } from 'lucide-react';
 import { DevTimeMachine } from './components/DevTimeMachine';
+import { Role } from '@self/contracts';
 
 interface DashboardProps {
-  view: 'tasks' | 'skills';
+  view: 'tasks' | 'skills' | 'admin';
 }
 
 function Dashboard({ view }: DashboardProps) {
@@ -57,6 +59,20 @@ function Dashboard({ view }: DashboardProps) {
               >
                 Skills
               </NavLink>
+              {user?.role === Role.ADMIN && (
+                <NavLink
+                  to="/admin"
+                  className={({ isActive }) =>
+                    `px-2.5 py-1.5 rounded-md transition ${
+                      isActive
+                        ? 'text-indigo-600 font-semibold bg-indigo-50'
+                        : 'hover:text-slate-900 hover:bg-slate-100'
+                    }`
+                  }
+                >
+                  Admin
+                </NavLink>
+              )}
               <span
                 className="cursor-not-allowed opacity-40 px-2 py-1.5 hidden md:inline"
                 title="Coming soon"
@@ -111,8 +127,10 @@ function Dashboard({ view }: DashboardProps) {
             </div>
             <TaskList />
           </>
-        ) : (
+        ) : view === 'skills' ? (
           <SkillsPage />
+        ) : (
+          <AdminPage />
         )}
       </main>
     </div>
@@ -137,6 +155,14 @@ export function App() {
         element={
           <ProtectedRoute>
             <Dashboard view="skills" />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute requiredRole={Role.ADMIN}>
+            <Dashboard view="admin" />
           </ProtectedRoute>
         }
       />

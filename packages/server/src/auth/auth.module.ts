@@ -5,6 +5,7 @@ import { PasswordService } from './password.service';
 import { AuthService } from './auth.service';
 import { AuthGuard } from './guards/auth.guard';
 import { AuthController } from './auth.controller';
+import { AdminBootstrapService } from './admin-bootstrap.service';
 
 @Global()
 @Module({
@@ -16,7 +17,7 @@ import { AuthController } from './auth.controller';
     }),
   ],
   controllers: [AuthController],
-  providers: [PasswordService, AuthService, AuthGuard],
-  exports: [PasswordService, AuthService, AuthGuard, JwtModule],
+  providers: [PasswordService, AuthService, AuthGuard, AdminBootstrapService],
+  exports: [PasswordService, AuthService, AuthGuard, AdminBootstrapService, JwtModule],
 })
 export class AuthModule {}

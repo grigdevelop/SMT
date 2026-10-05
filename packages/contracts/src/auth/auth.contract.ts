@@ -11,9 +11,13 @@ export const RoleSchema = z.enum(['ADMIN', 'USER']);
 export const RegisterSchema = z.object({
   email: z.string().trim().toLowerCase().email('Invalid email address').max(255),
   password: z.string().min(8, 'Password must be at least 8 characters').max(100),
-  role: RoleSchema.optional().default(Role.USER),
 });
 export type RegisterDto = z.infer<typeof RegisterSchema>;
+
+export const UpdateUserRoleSchema = z.object({
+  role: RoleSchema,
+});
+export type UpdateUserRoleDto = z.infer<typeof UpdateUserRoleSchema>;
 
 export const LoginSchema = z.object({
   email: z.string().trim().toLowerCase().email('Invalid email address'),
@@ -36,6 +40,11 @@ export interface UserDto {
   readonly role: Role;
   readonly createdAt: string;
   readonly updatedAt: string;
+}
+
+export interface AdminUserListItemDto extends UserDto {
+  readonly taskCount: number;
+  readonly skillCount: number;
 }
 
 export interface AuthResponseDto {

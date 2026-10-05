@@ -9,6 +9,8 @@ import type {
   SkillDto,
   CreateSkillDto,
   UpdateSkillDto,
+  AdminUserListItemDto,
+  Role,
 } from '@self/contracts';
 
 const BASE_URL = import.meta.env.VITE_API_URL || '/api';
@@ -176,6 +178,43 @@ export const api = {
         headers: getHeaders(),
       });
       if (!res.ok) throw new Error('Failed to delete skill');
+    },
+  },
+
+  admin: {
+    async listUsers(): Promise<AdminUserListItemDto[]> {
+      const res = await fetch(`${BASE_URL}/admin/users`, {
+        headers: getHeaders(),
+      });
+      if (!res.ok) {
+        const error = await res.json().catch(() => ({}));
+        throw new Error(error.message || 'Failed to fetch users');
+      }
+      return res.json();
+    },
+
+    async updateUserRole(id: string, role: Role): Promise<UserDto> {
+      const res = await fetch(`${BASE_URL}/admin/users/${id}/role`, {
+        method: 'PATCH',
+        headers: getHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({ role }),
+      });
+      if (!res.ok) {
+        const error = await res.json().catch(() => ({}));
+        throw new Error(error.message || 'Failed to update user role');
+      }
+      return res.json();
+    },
+
+    async deleteUser(id: string): Promise<void> {
+      const res = await fetch(`${BASE_URL}/admin/users/${id}`, {
+        method: 'DELETE',
+        headers: getHeaders(),
+      });
+      if (!res.ok) {
+        const error = await res.json().catch(() => ({}));
+        throw new Error(error.message || 'Failed to delete user');
+      }
     },
   },
 };
