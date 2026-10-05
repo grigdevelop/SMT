@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useAutoAnimate } from '@formkit/auto-animate/react';
 import type { RecurrenceRule } from '@self/contracts';
 import { useTasks, useCreateTask, useToggleTask, useDeleteTask, useUpdateTask } from './use-tasks';
 import { useCurrentDate } from '../../lib/date-context';
@@ -9,6 +10,8 @@ import { Plus, Loader2, Calendar, Clock, CalendarDays, FileText } from 'lucide-r
 import { SkillSelector } from '../skills/SkillSelector';
 
 export function TaskList() {
+  const [formRef] = useAutoAnimate<HTMLFormElement>({ duration: 150 });
+  const [listRef] = useAutoAnimate<HTMLDivElement>({ duration: 150 });
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [todoDate, setTodoDate] = useState('');
@@ -75,6 +78,7 @@ export function TaskList() {
     <div className="w-full max-w-xl mx-auto space-y-6">
       {/* Add Task Form */}
       <form
+        ref={formRef}
         onSubmit={handleSubmit}
         className="space-y-3 bg-white p-4 rounded-xl border border-slate-200 shadow-xs"
       >
@@ -91,7 +95,7 @@ export function TaskList() {
             type="button"
             onClick={() => setShowDetails(!showDetails)}
             title="Set execution date, deadline, or notes"
-            className={`px-2.5 sm:px-3 py-2 sm:py-2.5 border rounded-lg text-xs font-medium flex items-center gap-1 sm:gap-1.5 transition cursor-pointer shrink-0 ${
+            className={`px-2.5 sm:px-3 py-2 sm:py-2.5 border rounded-lg text-xs font-medium flex items-center gap-1 sm:gap-1.5 transition-all duration-75 active:scale-95 motion-reduce:transform-none cursor-pointer shrink-0 ${
               showDetails ||
               todoDate ||
               deadline ||
@@ -108,7 +112,7 @@ export function TaskList() {
           <button
             type="submit"
             disabled={!title.trim() || createTask.isPending}
-            className="inline-flex items-center px-3 sm:px-4 py-2 sm:py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-lg text-xs sm:text-sm font-semibold shadow-2xs transition cursor-pointer shrink-0"
+            className="inline-flex items-center px-3 sm:px-4 py-2 sm:py-2.5 bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] motion-reduce:transform-none disabled:opacity-50 text-white rounded-lg text-xs sm:text-sm font-semibold shadow-2xs transition-all duration-75 cursor-pointer shrink-0"
           >
             <Plus className="w-4 h-4 sm:mr-1" />
             <span className="hidden xs:inline">Add</span>
@@ -210,7 +214,7 @@ export function TaskList() {
       )}
 
       {/* Task List */}
-      <div className="space-y-2">
+      <div ref={listRef} className="space-y-2">
         {tasks.length === 0 ? (
           <div className="text-center py-12 border-2 border-dashed border-slate-200 rounded-xl text-slate-400 text-sm">
             No tasks yet. Add your first task above.

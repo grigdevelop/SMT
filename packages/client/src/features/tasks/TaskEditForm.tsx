@@ -244,7 +244,7 @@ export function TaskEditForm({
           type="button"
           onClick={onCancel}
           disabled={isSaving}
-          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-medium transition cursor-pointer"
+          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md border border-slate-200 hover:bg-slate-50 active:scale-[0.98] motion-reduce:transform-none text-slate-700 text-xs font-medium transition-all duration-75 cursor-pointer"
         >
           <X className="w-3.5 h-3.5" />
           Cancel
@@ -252,7 +252,7 @@ export function TaskEditForm({
         <button
           type="submit"
           disabled={isTitleEmpty || isSaving}
-          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-xs font-semibold shadow-2xs transition cursor-pointer"
+          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] motion-reduce:transform-none disabled:opacity-50 text-white text-xs font-semibold shadow-2xs transition-all duration-75 cursor-pointer"
         >
           <Check className="w-3.5 h-3.5" />
           Save Changes

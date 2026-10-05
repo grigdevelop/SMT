@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { useSkills, useCreateSkill } from './use-skills';
 import { SKILL_COLOR_PALETTE, DEFAULT_SKILL_COLOR } from '@self/contracts';
 import { Sparkles, X, Plus } from 'lucide-react';
@@ -10,6 +11,7 @@ export interface SkillSelectorProps {
 }
 
 export function SkillSelector({ selectedSkillIds, onChange, maxSkills = 10 }: SkillSelectorProps) {
+  const [chipsRef] = useAutoAnimate<HTMLDivElement>({ duration: 150 });
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -98,7 +100,10 @@ export function SkillSelector({ selectedSkillIds, onChange, maxSkills = 10 }: Sk
       </div>
 
       {/* Selected skill chips */}
-      <div className="flex flex-wrap items-center gap-1.5 min-h-[28px] p-1.5 rounded-md border border-slate-200 bg-white shadow-2xs">
+      <div
+        ref={chipsRef}
+        className="flex flex-wrap items-center gap-1.5 min-h-[28px] p-1.5 rounded-md border border-slate-200 bg-white shadow-2xs"
+      >
         {selectedSkills.map((skill) => (
           <span
             key={skill.id}

@@ -103,7 +103,7 @@ function Dashboard({ view }: DashboardProps) {
               type="button"
               onClick={logout}
               title="Sign out of your account"
-              className="flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-rose-600 transition p-1.5 rounded-md cursor-pointer"
+              className="flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-rose-600 active:scale-95 motion-reduce:transform-none transition-all duration-75 p-1.5 rounded-md cursor-pointer"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Sign out</span>

@@ -244,4 +244,18 @@ describe('TaskItem & Inline Editing', () => {
     expect(rewardPill.textContent).toContain('+1 #Math');
     expect(rewardPill.textContent).toContain('+1 #Physics');
   });
+
+  it('triggers checkmark-pop animation class and tactile feedback when completed', () => {
+    const onToggle = vi.fn();
+    renderWithQuery(mockTask, { onToggle });
+
+    const toggleBtn = screen.getByRole('button', { name: /mark complete/i });
+    expect(toggleBtn.className).toContain('active:scale-90');
+    expect(toggleBtn.className).toContain('motion-reduce:transform-none');
+    expect(toggleBtn.className).not.toContain('animate-checkmark-pop');
+
+    fireEvent.click(toggleBtn);
+    expect(onToggle).toHaveBeenCalledWith('task-123', true);
+    expect(toggleBtn.className).toContain('animate-checkmark-pop');
+  });
 });

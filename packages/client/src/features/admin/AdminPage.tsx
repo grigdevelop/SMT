@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { useAuth } from '../auth/AuthContext';
 import { useAdminUsers, useUpdateUserRole, useDeleteUser } from './use-admin-users';
 import { Role } from '@self/contracts';
@@ -13,6 +14,8 @@ import {
 } from 'lucide-react';
 
 export function AdminPage() {
+  const [tableBodyRef] = useAutoAnimate<HTMLTableSectionElement>({ duration: 150 });
+  const [mobileCardsRef] = useAutoAnimate<HTMLDivElement>({ duration: 150 });
   const { user: currentUser } = useAuth();
   const { data: users = [], isLoading, error } = useAdminUsers();
   const updateRoleMutation = useUpdateUserRole();
@@ -170,7 +173,7 @@ export function AdminPage() {
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody ref={tableBodyRef} className="divide-y divide-slate-100">
                   {users.map((u) => {
                     const isSelf = u.id === currentUser?.id;
                     const isConfirmingDelete = confirmDeleteId === u.id;
@@ -243,14 +246,14 @@ export function AdminPage() {
                                 type="button"
                                 onClick={() => handleDeleteUser(u.id)}
                                 disabled={deleteUserMutation.isPending}
-                                className="px-2 py-0.5 rounded bg-rose-600 hover:bg-rose-700 text-white text-2xs font-semibold transition cursor-pointer"
+                                className="px-2 py-0.5 rounded bg-rose-600 hover:bg-rose-700 active:scale-95 motion-reduce:transform-none text-white text-2xs font-semibold transition-all duration-75 cursor-pointer"
                               >
                                 Confirm
                               </button>
                               <button
                                 type="button"
                                 onClick={() => setConfirmDeleteId(null)}
-                                className="px-2 py-0.5 rounded bg-slate-200 hover:bg-slate-300 text-slate-700 text-2xs font-semibold transition cursor-pointer"
+                                className="px-2 py-0.5 rounded bg-slate-200 hover:bg-slate-300 active:scale-95 motion-reduce:transform-none text-slate-700 text-2xs font-semibold transition-all duration-75 cursor-pointer"
                               >
                                 Cancel
                               </button>
@@ -261,7 +264,7 @@ export function AdminPage() {
                               onClick={() => setConfirmDeleteId(u.id)}
                               title={`Delete ${u.email}`}
                               aria-label={`Delete user ${u.email}`}
-                              className="p-1.5 text-slate-400 hover:text-rose-600 rounded transition cursor-pointer inline-flex items-center justify-center"
+                              className="p-1.5 text-slate-400 hover:text-rose-600 active:scale-90 motion-reduce:transform-none rounded transition-all duration-75 cursor-pointer inline-flex items-center justify-center"
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>
@@ -275,7 +278,7 @@ export function AdminPage() {
             </div>
 
             {/* Mobile Card View (Hidden on sm+) */}
-            <div className="sm:hidden divide-y divide-slate-100">
+            <div ref={mobileCardsRef} className="sm:hidden divide-y divide-slate-100">
               {users.map((u) => {
                 const isSelf = u.id === currentUser?.id;
                 const isConfirmingDelete = confirmDeleteId === u.id;
@@ -338,14 +341,14 @@ export function AdminPage() {
                                 type="button"
                                 onClick={() => handleDeleteUser(u.id)}
                                 disabled={deleteUserMutation.isPending}
-                                className="px-2 py-1 rounded bg-rose-600 text-white font-semibold text-2xs"
+                                className="px-2 py-1 rounded bg-rose-600 hover:bg-rose-700 active:scale-95 motion-reduce:transform-none text-white font-semibold text-2xs transition-all duration-75 cursor-pointer"
                               >
                                 Confirm
                               </button>
                               <button
                                 type="button"
                                 onClick={() => setConfirmDeleteId(null)}
-                                className="px-2 py-1 rounded bg-slate-200 text-slate-700 font-semibold text-2xs"
+                                className="px-2 py-1 rounded bg-slate-200 hover:bg-slate-300 active:scale-95 motion-reduce:transform-none text-slate-700 font-semibold text-2xs transition-all duration-75 cursor-pointer"
                               >
                                 Cancel
                               </button>
@@ -355,7 +358,7 @@ export function AdminPage() {
                               type="button"
                               onClick={() => setConfirmDeleteId(u.id)}
                               aria-label={`Delete user ${u.email}`}
-                              className="text-rose-600 font-medium hover:underline p-1"
+                              className="text-rose-600 font-medium hover:underline p-1 cursor-pointer"
                             >
                               Delete
                             </button>

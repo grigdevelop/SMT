@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { useSkills, useCreateSkill, useUpdateSkill, useDeleteSkill } from './use-skills';
 import {
   getSkillTier,
@@ -21,6 +22,8 @@ import {
 } from 'lucide-react';
 
 export function SkillsPage() {
+  const [pageRef] = useAutoAnimate<HTMLDivElement>({ duration: 150 });
+  const [gridRef] = useAutoAnimate<HTMLDivElement>({ duration: 150 });
   const { data: skills = [], isLoading, error } = useSkills();
   const createSkill = useCreateSkill();
   const updateSkill = useUpdateSkill();
@@ -146,7 +149,7 @@ export function SkillsPage() {
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-6">
+    <div ref={pageRef} className="w-full max-w-4xl mx-auto space-y-6">
       {/* Header and Summary Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
         <div>
@@ -180,7 +183,7 @@ export function SkillsPage() {
             <button
               type="button"
               onClick={handleStartCreate}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold shadow-2xs transition cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] motion-reduce:transform-none text-white rounded-lg text-xs font-semibold shadow-2xs transition-all duration-75 cursor-pointer"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>New Skill</span>
@@ -227,7 +230,7 @@ export function SkillsPage() {
                   key={color}
                   type="button"
                   onClick={() => setNewSkillColor(color)}
-                  className={`w-6 h-6 rounded-full transition transform cursor-pointer shrink-0 ${
+                  className={`w-6 h-6 rounded-full transition-transform active:scale-90 motion-reduce:transform-none cursor-pointer shrink-0 ${
                     newSkillColor === color
                       ? 'ring-2 ring-offset-2 ring-indigo-500 scale-110'
                       : 'hover:opacity-80'
@@ -245,14 +248,14 @@ export function SkillsPage() {
             <button
               type="button"
               onClick={handleCancelCreate}
-              className="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-xs text-slate-600 font-medium cursor-pointer"
+              className="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 active:scale-[0.98] motion-reduce:transform-none text-xs text-slate-600 font-medium transition-all duration-75 cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={!newSkillName.trim() || createSkill.isPending}
-              className="px-4 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-xs text-white font-semibold shadow-2xs cursor-pointer flex items-center gap-1"
+              className="px-4 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] motion-reduce:transform-none disabled:opacity-50 text-xs text-white font-semibold shadow-2xs transition-all duration-75 cursor-pointer flex items-center gap-1"
             >
               <Check className="w-3.5 h-3.5" />
               <span>Create Skill</span>
@@ -280,7 +283,7 @@ export function SkillsPage() {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div ref={gridRef} className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {skills.map((skill) => {
             const isEditing = editingSkillId === skill.id;
             const tierProgress = getSkillTier(skill.completedTaskCount);
@@ -318,7 +321,7 @@ export function SkillsPage() {
                         key={color}
                         type="button"
                         onClick={() => setEditColor(color)}
-                        className={`w-5 h-5 rounded-full transition transform cursor-pointer shrink-0 ${
+                        className={`w-5 h-5 rounded-full transition-transform active:scale-90 motion-reduce:transform-none cursor-pointer shrink-0 ${
                           editColor === color
                             ? 'ring-2 ring-offset-2 ring-indigo-500 scale-110'
                             : 'hover:opacity-80'
@@ -335,14 +338,14 @@ export function SkillsPage() {
                     <button
                       type="button"
                       onClick={handleCancelEdit}
-                      className="px-2.5 py-1 rounded-md border border-slate-200 text-xs text-slate-600 cursor-pointer"
+                      className="px-2.5 py-1 rounded-md border border-slate-200 text-xs text-slate-600 active:scale-[0.98] motion-reduce:transform-none transition-all duration-75 cursor-pointer"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
                       disabled={!editName.trim() || updateSkill.isPending}
-                      className="px-3 py-1 rounded-md bg-indigo-600 text-white text-xs font-medium cursor-pointer"
+                      className="px-3 py-1 rounded-md bg-indigo-600 text-white text-xs font-medium active:scale-[0.98] motion-reduce:transform-none transition-all duration-75 cursor-pointer"
                     >
                       Save
                     </button>
@@ -382,7 +385,7 @@ export function SkillsPage() {
                       type="button"
                       onClick={() => handleStartEdit(skill)}
                       aria-label={`Edit ${skill.name}`}
-                      className="text-slate-400 hover:text-indigo-600 sm:opacity-0 sm:group-hover:opacity-100 focus:opacity-100 p-1.5 rounded transition cursor-pointer"
+                      className="text-slate-400 hover:text-indigo-600 active:scale-90 motion-reduce:transform-none sm:opacity-0 sm:group-hover:opacity-100 focus:opacity-100 p-1.5 rounded transition-all duration-75 cursor-pointer"
                     >
                       <Pencil className="w-3.5 h-3.5" />
                     </button>
@@ -390,7 +393,7 @@ export function SkillsPage() {
                       type="button"
                       onClick={() => handleDelete(skill.id, skill.name)}
                       aria-label={`Delete ${skill.name}`}
-                      className="text-slate-400 hover:text-rose-600 sm:opacity-0 sm:group-hover:opacity-100 focus:opacity-100 p-1.5 rounded transition cursor-pointer"
+                      className="text-slate-400 hover:text-rose-600 active:scale-90 motion-reduce:transform-none sm:opacity-0 sm:group-hover:opacity-100 focus:opacity-100 p-1.5 rounded transition-all duration-75 cursor-pointer"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useAutoAnimate } from '@formkit/auto-animate/react';
 import type { TaskDto, UpdateTaskDto } from '@self/contracts';
 import { getTaskStatus, TaskStatus, formatRecurrenceLabel } from '@self/contracts';
 import { TaskEditForm } from './TaskEditForm';
@@ -27,9 +28,11 @@ export interface TaskItemProps {
 }
 
 export function TaskItem({ task, currentDate, onToggle, onDelete, onUpdate }: TaskItemProps) {
+  const [itemRef] = useAutoAnimate<HTMLDivElement>({ duration: 150 });
   const [isEditing, setIsEditing] = useState(false);
   const [isNotesExpanded, setIsNotesExpanded] = useState(false);
   const [rewardVisible, setRewardVisible] = useState(false);
+  const [justCompleted, setJustCompleted] = useState(false);
 
   const status = getTaskStatus(task, currentDate);
   const isUpcoming = status === TaskStatus.UPCOMING;
@@ -52,16 +55,21 @@ export function TaskItem({ task, currentDate, onToggle, onDelete, onUpdate }: Ta
 
   const handleToggleClick = () => {
     const nextCompleted = !task.isCompleted;
-    if (nextCompleted && task.skills && task.skills.length > 0) {
-      setRewardVisible(true);
-      setTimeout(() => setRewardVisible(false), 2000);
+    if (nextCompleted) {
+      setJustCompleted(true);
+      setTimeout(() => setJustCompleted(false), 200);
+      if (task.skills && task.skills.length > 0) {
+        setRewardVisible(true);
+        setTimeout(() => setRewardVisible(false), 2000);
+      }
     }
     onToggle(task.id, nextCompleted);
   };
 
   return (
     <div
-      className={`relative p-3.5 rounded-lg border transition group ${
+      ref={itemRef}
+      className={`relative p-3.5 rounded-lg border transition-all duration-150 group ${
         task.isCompleted
           ? 'border-slate-100 bg-slate-50/50'
           : isOverdue
@@ -75,7 +83,7 @@ export function TaskItem({ task, currentDate, onToggle, onDelete, onUpdate }: Ta
       {rewardVisible && task.skills && task.skills.length > 0 && (
         <div
           data-testid="micro-reward-pill"
-          className="absolute right-4 -top-3.5 z-20 flex items-center gap-1.5 shadow-md bg-white border border-indigo-200 px-2.5 py-1 rounded-full text-xs font-semibold animate-bounce pointer-events-none"
+          className="absolute right-4 -top-3.5 z-20 flex items-center gap-1.5 shadow-md bg-white border border-indigo-200 px-2.5 py-1 rounded-full text-xs font-semibold animate-bounce motion-reduce:animate-none pointer-events-none"
         >
           <Sparkles className="w-3.5 h-3.5 text-indigo-500" />
           {task.skills.map((s) => (
@@ -103,11 +111,11 @@ export function TaskItem({ task, currentDate, onToggle, onDelete, onUpdate }: Ta
               type="button"
               onClick={handleToggleClick}
               aria-label={task.isCompleted ? 'Mark incomplete' : 'Mark complete'}
-              className={`w-6 h-6 sm:w-5 sm:h-5 rounded border flex items-center justify-center transition-colors cursor-pointer shrink-0 ${
+              className={`w-6 h-6 sm:w-5 sm:h-5 rounded border flex items-center justify-center transition-all duration-100 active:scale-90 motion-reduce:transform-none cursor-pointer shrink-0 ${
                 task.isCompleted
                   ? 'bg-emerald-500 border-emerald-500 text-white'
                   : 'border-slate-300 hover:border-slate-400 bg-white'
-              }`}
+              } ${justCompleted ? 'animate-checkmark-pop motion-reduce:animate-none' : ''}`}
             >
               {task.isCompleted && <Check className="w-3.5 h-3.5 stroke-[3]" />}
             </button>
@@ -214,7 +222,7 @@ export function TaskItem({ task, currentDate, onToggle, onDelete, onUpdate }: Ta
                     setIsNotesExpanded(!isNotesExpanded);
                   }}
                   title={isNotesExpanded ? 'Collapse notes' : 'View formatted notes'}
-                  className="inline-flex items-center gap-1 text-2xs px-1.5 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium transition cursor-pointer"
+                  className="inline-flex items-center gap-1 text-2xs px-1.5 py-0.5 rounded bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-600 font-medium transition-all duration-75 motion-reduce:transform-none cursor-pointer"
                 >
                   <FileText className="w-3 h-3 text-indigo-600" />
                   <span>Notes</span>
@@ -236,7 +244,7 @@ export function TaskItem({ task, currentDate, onToggle, onDelete, onUpdate }: Ta
             onClick={() => setIsEditing(true)}
             aria-label="Edit task"
             title="Edit task"
-            className="text-slate-400 hover:text-indigo-600 sm:opacity-0 sm:group-hover:opacity-100 focus:opacity-100 p-1.5 rounded transition cursor-pointer"
+            className="text-slate-400 hover:text-indigo-600 active:scale-90 motion-reduce:transform-none sm:opacity-0 sm:group-hover:opacity-100 focus:opacity-100 p-1.5 rounded transition-all duration-75 cursor-pointer"
           >
             <Pencil className="w-3.5 h-3.5" />
           </button>
@@ -245,7 +253,7 @@ export function TaskItem({ task, currentDate, onToggle, onDelete, onUpdate }: Ta
             onClick={() => onDelete(task.id)}
             aria-label="Delete task"
             title="Delete task"
-            className="text-slate-400 hover:text-rose-500 sm:opacity-0 sm:group-hover:opacity-100 focus:opacity-100 p-1.5 rounded transition cursor-pointer"
+            className="text-slate-400 hover:text-rose-500 active:scale-90 motion-reduce:transform-none sm:opacity-0 sm:group-hover:opacity-100 focus:opacity-100 p-1.5 rounded transition-all duration-75 cursor-pointer"
           >
             <Trash2 className="w-3.5 h-3.5" />
           </button>
