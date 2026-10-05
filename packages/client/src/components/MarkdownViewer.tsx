@@ -32,7 +32,7 @@ export function MarkdownViewer({ content, className = '' }: MarkdownViewerProps)
 
   return (
     <div
-      className={`prose prose-sm max-w-none text-foreground text-xs leading-relaxed space-y-1.5 [&_ul]:list-disc [&_ul]:list-inside [&_ol]:list-decimal [&_ol]:list-inside [&_code]:bg-muted [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded [&_code]:font-mono [&_code]:text-foreground [&_pre]:bg-slate-900 dark:[&_pre]:bg-slate-950 [&_pre]:text-slate-100 [&_pre]:p-2.5 [&_pre]:rounded-md [&_pre]:overflow-x-auto [&_a]:text-primary [&_a]:underline [&_blockquote]:border-l-2 [&_blockquote]:border-border [&_blockquote]:pl-2.5 [&_blockquote]:italic ${className}`}
+      className={`prose prose-sm max-w-none text-base-content text-xs leading-relaxed space-y-1.5 [&_ul]:list-disc [&_ul]:list-inside [&_ol]:list-decimal [&_ol]:list-inside [&_code]:bg-base-200 [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded [&_code]:font-mono [&_code]:text-base-content [&_pre]:bg-neutral [&_pre]:text-neutral-content [&_pre]:p-2.5 [&_pre]:rounded-md [&_pre]:overflow-x-auto [&_a]:text-primary [&_a]:underline [&_blockquote]:border-l-2 [&_blockquote]:border-base-300 [&_blockquote]:pl-2.5 [&_blockquote]:italic ${className}`}
       dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
     />
   );

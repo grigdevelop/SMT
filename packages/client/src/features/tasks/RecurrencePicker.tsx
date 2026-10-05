@@ -192,11 +192,11 @@ export function RecurrencePicker({ value, onChange, currentDate }: RecurrencePic
   const maxYearlyDays = MONTHS.find((m) => m.id === selectedMonth)?.maxDays ?? 31;
 
   return (
-    <div className="space-y-2 rounded-md border border-border bg-muted/30 p-2.5">
+    <div className="space-y-2 rounded-lg border border-base-300 bg-base-200/40 p-2.5">
       <div className="flex items-center justify-between">
         <label
           htmlFor="recurrence-frequency-select"
-          className="text-2xs font-medium text-muted-foreground flex items-center gap-1.5"
+          className="text-2xs font-medium text-base-content/70 flex items-center gap-1.5"
         >
           <RotateCw className="w-3.5 h-3.5 text-primary" />
           <span>Repeat Frequency:</span>
@@ -206,7 +206,7 @@ export function RecurrencePicker({ value, onChange, currentDate }: RecurrencePic
           <button
             type="button"
             onClick={() => onChange(null)}
-            className="text-2xs text-muted-foreground hover:text-destructive flex items-center gap-0.5 cursor-pointer"
+            className="text-2xs text-base-content/60 hover:text-error flex items-center gap-0.5 cursor-pointer"
             title="Remove recurrence"
           >
             <X className="w-3 h-3" />
@@ -220,7 +220,7 @@ export function RecurrencePicker({ value, onChange, currentDate }: RecurrencePic
           id="recurrence-frequency-select"
           value={value ? value.frequency : 'none'}
           onChange={handleFrequencyChange}
-          className="px-2.5 py-1.5 sm:py-1 text-base sm:text-xs rounded border border-border bg-card text-foreground shadow-2xs focus:ring-1 focus:ring-primary focus:outline-hidden"
+          className="select select-bordered select-sm text-xs font-normal"
         >
           <option value="none">Does not repeat</option>
           <option value={RecurrenceFrequency.DAILY}>Daily</option>
@@ -232,7 +232,7 @@ export function RecurrencePicker({ value, onChange, currentDate }: RecurrencePic
         {value && (
           <span
             data-testid="recurrence-preview-badge"
-            className="text-2xs text-primary font-medium px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20 truncate max-w-xs"
+            className="badge badge-primary badge-outline text-2xs truncate max-w-xs"
           >
             {formatRecurrenceLabel(value)}
           </span>
@@ -241,7 +241,7 @@ export function RecurrencePicker({ value, onChange, currentDate }: RecurrencePic
 
       {/* Progressive Disclosure: DAILY */}
       {value?.frequency === RecurrenceFrequency.DAILY && (
-        <div className="pt-1.5 border-t border-border flex items-center gap-2 text-2xs text-foreground">
+        <div className="pt-1.5 border-t border-base-300 flex items-center gap-2 text-2xs text-base-content">
           <span>Repeat every</span>
           <input
             type="number"
@@ -249,7 +249,7 @@ export function RecurrencePicker({ value, onChange, currentDate }: RecurrencePic
             max={365}
             value={value.interval ?? 1}
             onChange={handleDailyIntervalChange}
-            className="w-14 px-1.5 py-1 sm:py-0.5 text-base sm:text-xs text-center rounded border border-border bg-card text-foreground focus:ring-1 focus:ring-primary focus:outline-hidden"
+            className="input input-bordered input-xs w-16 text-center font-mono"
           />
           <span>day(s)</span>
         </div>
@@ -257,8 +257,8 @@ export function RecurrencePicker({ value, onChange, currentDate }: RecurrencePic
 
       {/* Progressive Disclosure: WEEKLY */}
       {value?.frequency === RecurrenceFrequency.WEEKLY && (
-        <div className="pt-1.5 border-t border-border space-y-1">
-          <div className="text-2xs text-muted-foreground font-medium">Repeat on:</div>
+        <div className="pt-1.5 border-t border-base-300 space-y-1">
+          <div className="text-2xs text-base-content/70 font-medium">Repeat on:</div>
           <div className="flex items-center flex-wrap gap-1 sm:gap-1.5">
             {WEEKDAYS.map((day) => {
               const isSelected = value.daysOfWeek?.includes(day.id) ?? false;
@@ -269,10 +269,10 @@ export function RecurrencePicker({ value, onChange, currentDate }: RecurrencePic
                   aria-pressed={isSelected}
                   aria-label={day.full}
                   onClick={() => handleToggleWeekday(day.id)}
-                  className={`w-7 h-7 text-xs rounded-md border font-medium flex items-center justify-center transition cursor-pointer ${
+                  className={`btn btn-xs btn-square transition cursor-pointer ${
                     isSelected
-                      ? 'bg-primary text-primary-foreground border-primary shadow-2xs'
-                      : 'bg-card text-foreground border-border hover:bg-accent hover:border-border/80'
+                      ? 'btn-primary text-primary-content'
+                      : 'btn-ghost border border-base-300 text-base-content hover:bg-base-200'
                   }`}
                 >
                   {day.short}
@@ -281,7 +281,7 @@ export function RecurrencePicker({ value, onChange, currentDate }: RecurrencePic
             })}
           </div>
           {(!value.daysOfWeek || value.daysOfWeek.length === 0) && (
-            <p className="text-2xs text-destructive font-medium">
+            <p className="text-2xs text-error font-medium">
               Please select at least one day of the week.
             </p>
           )}
@@ -290,8 +290,8 @@ export function RecurrencePicker({ value, onChange, currentDate }: RecurrencePic
 
       {/* Progressive Disclosure: MONTHLY */}
       {value?.frequency === RecurrenceFrequency.MONTHLY && (
-        <div className="pt-1.5 border-t border-border space-y-1.5">
-          <div className="text-2xs text-muted-foreground font-medium">
+        <div className="pt-1.5 border-t border-base-300 space-y-1.5">
+          <div className="text-2xs text-base-content/70 font-medium">
             Repeat on day(s) of the month:
           </div>
           <div className="grid grid-cols-7 sm:grid-cols-11 gap-1 max-w-sm">
@@ -304,10 +304,10 @@ export function RecurrencePicker({ value, onChange, currentDate }: RecurrencePic
                   aria-pressed={isSelected}
                   aria-label={`Day ${dayNum}`}
                   onClick={() => handleToggleMonthDay(dayNum)}
-                  className={`w-7 h-7 sm:w-6 sm:h-6 text-xs sm:text-2xs rounded border flex items-center justify-center transition cursor-pointer ${
+                  className={`btn btn-xs btn-square transition cursor-pointer ${
                     isSelected
-                      ? 'bg-primary text-primary-foreground border-primary font-bold shadow-2xs'
-                      : 'bg-card text-foreground border-border hover:bg-accent'
+                      ? 'btn-primary text-primary-content font-bold'
+                      : 'btn-ghost border border-base-300 text-base-content hover:bg-base-200'
                   }`}
                 >
                   {dayNum}
@@ -316,7 +316,7 @@ export function RecurrencePicker({ value, onChange, currentDate }: RecurrencePic
             })}
           </div>
           {(!value.daysOfMonth || value.daysOfMonth.length === 0) && (
-            <p className="text-2xs text-destructive font-medium">
+            <p className="text-2xs text-error font-medium">
               Please select at least one day of the month.
             </p>
           )}
@@ -325,12 +325,12 @@ export function RecurrencePicker({ value, onChange, currentDate }: RecurrencePic
 
       {/* Progressive Disclosure: YEARLY */}
       {value?.frequency === RecurrenceFrequency.YEARLY && (
-        <div className="pt-1.5 border-t border-border flex items-center flex-wrap gap-2 text-2xs text-foreground">
+        <div className="pt-1.5 border-t border-base-300 flex items-center flex-wrap gap-2 text-2xs text-base-content">
           <span>Every year on:</span>
           <select
             value={selectedMonth}
             onChange={handleYearlyMonthChange}
-            className="px-2 py-1 sm:py-0.5 text-base sm:text-xs rounded border border-border bg-card text-foreground shadow-2xs focus:ring-1 focus:ring-primary focus:outline-hidden"
+            className="select select-bordered select-xs"
           >
             {MONTHS.map((m) => (
               <option key={m.id} value={m.id}>
@@ -341,7 +341,7 @@ export function RecurrencePicker({ value, onChange, currentDate }: RecurrencePic
           <select
             value={value.yearlyDate?.day ?? 1}
             onChange={handleYearlyDayChange}
-            className="px-2 py-1 sm:py-0.5 text-base sm:text-xs rounded border border-border bg-card text-foreground shadow-2xs focus:ring-1 focus:ring-primary focus:outline-hidden"
+            className="select select-bordered select-xs"
           >
             {Array.from({ length: maxYearlyDays }, (_, i) => i + 1).map((dayNum) => (
               <option key={dayNum} value={dayNum}>
@@ -354,12 +354,12 @@ export function RecurrencePicker({ value, onChange, currentDate }: RecurrencePic
 
       {/* Recurrence Horizon: Starts On & Ends On */}
       {value && (
-        <div className="pt-2 border-t border-border flex flex-col sm:flex-row sm:flex-wrap gap-2.5 sm:gap-4 text-2xs text-foreground">
+        <div className="pt-2 border-t border-base-300 flex flex-col sm:flex-row sm:flex-wrap gap-2.5 sm:gap-4 text-2xs text-base-content">
           {/* Starts on */}
           <div className="flex flex-col gap-1">
             <label
               htmlFor="recurrence-start-date"
-              className="font-medium flex items-center gap-1 text-muted-foreground"
+              className="font-medium flex items-center gap-1 text-base-content/70"
             >
               <CalendarDays className="w-3.5 h-3.5 text-primary" />
               <span>Starts on:</span>
@@ -370,13 +370,13 @@ export function RecurrencePicker({ value, onChange, currentDate }: RecurrencePic
                 type="date"
                 value={value.startDate ?? (currentDate || '')}
                 onChange={handleStartDateChange}
-                className="px-2 py-1 sm:py-0.5 text-base sm:text-xs rounded border border-border bg-card text-foreground shadow-2xs focus:ring-1 focus:ring-primary focus:outline-hidden"
+                className="input input-bordered input-xs font-mono"
               />
               {currentDate && (
                 <button
                   type="button"
                   onClick={() => onChange({ ...value, startDate: currentDate })}
-                  className="text-2xs px-2 py-1 sm:py-0.5 rounded bg-secondary hover:bg-secondary/80 text-secondary-foreground font-medium cursor-pointer"
+                  className="btn btn-ghost btn-xs text-primary"
                 >
                   Today
                 </button>
@@ -388,9 +388,9 @@ export function RecurrencePicker({ value, onChange, currentDate }: RecurrencePic
           <div className="flex flex-col gap-1">
             <label
               htmlFor="recurrence-end-date"
-              className="font-medium flex items-center gap-1 text-muted-foreground"
+              className="font-medium flex items-center gap-1 text-base-content/70"
             >
-              <Clock className="w-3.5 h-3.5 text-muted-foreground" />
+              <Clock className="w-3.5 h-3.5 text-base-content/60" />
               <span>Ends on (Optional):</span>
             </label>
             <div className="flex items-center gap-1.5">
@@ -399,13 +399,13 @@ export function RecurrencePicker({ value, onChange, currentDate }: RecurrencePic
                 type="date"
                 value={value.endDate ?? ''}
                 onChange={handleEndDateChange}
-                className="px-2 py-1 sm:py-0.5 text-base sm:text-xs rounded border border-border bg-card text-foreground shadow-2xs focus:ring-1 focus:ring-primary focus:outline-hidden"
+                className="input input-bordered input-xs font-mono"
               />
               {value.endDate && (
                 <button
                   type="button"
                   onClick={() => onChange({ ...value, endDate: null })}
-                  className="text-2xs px-2 py-1 sm:py-0.5 rounded hover:bg-destructive/10 text-destructive font-medium cursor-pointer"
+                  className="btn btn-ghost btn-xs text-error hover:bg-error/10"
                   title="Clear end date"
                 >
                   Never

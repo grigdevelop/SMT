@@ -3,29 +3,23 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../lib/utils';
 
 export const buttonVariants = cva(
-  'inline-flex items-center justify-center font-medium rounded-lg transition-all duration-75 active:scale-[0.98] motion-reduce:transform-none disabled:opacity-50 disabled:pointer-events-none select-none cursor-pointer',
+  'btn font-medium transition-all duration-75 active:scale-[0.98] motion-reduce:transform-none select-none',
   {
     variants: {
       variant: {
-        primary:
-          'bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white shadow-2xs border border-transparent',
-        secondary:
-          'bg-secondary text-secondary-foreground hover:bg-slate-200 dark:hover:bg-slate-700/80 border border-transparent',
-        outline:
-          'border border-border bg-card text-foreground hover:bg-muted hover:border-slate-300 dark:hover:border-slate-700',
-        ghost:
-          'text-muted-foreground hover:text-foreground hover:bg-muted active:bg-slate-200 dark:active:bg-slate-700 border border-transparent',
-        danger:
-          'bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white shadow-2xs border border-transparent',
-        destructiveOutline:
-          'border border-rose-200 dark:border-rose-900/50 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40',
+        primary: 'btn-primary text-primary-content',
+        secondary: 'btn-secondary',
+        outline: 'btn-outline',
+        ghost: 'btn-ghost',
+        danger: 'btn-error text-white',
+        destructiveOutline: 'btn-outline btn-error',
       },
       size: {
-        sm: 'px-2.5 py-1 text-xs',
-        md: 'px-3.5 py-2 text-xs sm:text-sm',
-        lg: 'px-4 py-2.5 text-sm',
-        icon: 'p-1.5 active:scale-90',
-        iconSm: 'p-1 active:scale-90 text-xs',
+        sm: 'btn-sm',
+        md: '',
+        lg: 'btn-lg',
+        icon: 'btn-square btn-sm',
+        iconSm: 'btn-square btn-xs',
       },
     },
     defaultVariants: {

@@ -10,6 +10,7 @@ function TestConsumer() {
       <span data-testid="resolved-theme">{resolvedTheme}</span>
       <button onClick={() => setTheme('dark')}>Set Dark</button>
       <button onClick={() => setTheme('light')}>Set Light</button>
+      <button onClick={() => setTheme('black')}>Set Black</button>
       <button onClick={toggleTheme}>Toggle</button>
     </div>
   );
@@ -19,11 +20,13 @@ describe('ThemeContext & ThemeToggle', () => {
   beforeEach(() => {
     localStorage.clear();
     document.documentElement.classList.remove('dark');
+    document.documentElement.removeAttribute('data-theme');
   });
 
   afterEach(() => {
     localStorage.clear();
     document.documentElement.classList.remove('dark');
+    document.documentElement.removeAttribute('data-theme');
   });
 
   it('defaults to system/light when no preference is stored', () => {
@@ -36,7 +39,7 @@ describe('ThemeContext & ThemeToggle', () => {
     expect(screen.getByTestId('current-theme').textContent).toBe('system');
   });
 
-  it('updates theme to dark and sets .dark class on documentElement', () => {
+  it('updates theme to dark and sets .dark class and data-theme on documentElement', () => {
     render(
       <ThemeProvider>
         <TestConsumer />
@@ -50,7 +53,26 @@ describe('ThemeContext & ThemeToggle', () => {
     expect(screen.getByTestId('current-theme').textContent).toBe('dark');
     expect(screen.getByTestId('resolved-theme').textContent).toBe('dark');
     expect(document.documentElement.classList.contains('dark')).toBe(true);
+    expect(document.documentElement.getAttribute('data-theme')).toBe('dark');
     expect(localStorage.getItem('smt_theme')).toBe('dark');
+  });
+
+  it('updates theme to black (OLED) and sets data-theme to black', () => {
+    render(
+      <ThemeProvider>
+        <TestConsumer />
+      </ThemeProvider>,
+    );
+
+    act(() => {
+      fireEvent.click(screen.getByText('Set Black'));
+    });
+
+    expect(screen.getByTestId('current-theme').textContent).toBe('black');
+    expect(screen.getByTestId('resolved-theme').textContent).toBe('black');
+    expect(document.documentElement.classList.contains('dark')).toBe(true);
+    expect(document.documentElement.getAttribute('data-theme')).toBe('black');
+    expect(localStorage.getItem('smt_theme')).toBe('black');
   });
 
   it('updates theme to light and removes .dark class', () => {

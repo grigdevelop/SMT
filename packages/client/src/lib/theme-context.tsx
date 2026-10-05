@@ -1,11 +1,11 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Sun, Moon } from 'lucide-react';
 
-export type Theme = 'light' | 'dark' | 'system';
+export type Theme = 'light' | 'dark' | 'black' | 'system';
 
 interface ThemeContextType {
   theme: Theme;
-  resolvedTheme: 'light' | 'dark';
+  resolvedTheme: 'light' | 'dark' | 'black';
   setTheme: (theme: Theme) => void;
   toggleTheme: () => void;
 }
@@ -19,7 +19,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     if (typeof window === 'undefined') return 'system';
     try {
       const stored = localStorage.getItem(THEME_STORAGE_KEY) as Theme | null;
-      if (stored === 'light' || stored === 'dark' || stored === 'system') {
+      if (stored === 'light' || stored === 'dark' || stored === 'black' || stored === 'system') {
         return stored;
       }
     } catch {
@@ -28,19 +28,21 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     return 'system';
   });
 
-  const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>(() => {
+  const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark' | 'black'>(() => {
     if (typeof window === 'undefined') return 'light';
     if (theme === 'light') return 'light';
     if (theme === 'dark') return 'dark';
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    if (theme === 'black') return 'black';
+    return window.matchMedia?.('(prefers-color-scheme: dark)')?.matches ? 'dark' : 'light';
   });
 
   useEffect(() => {
     const root = document.documentElement;
 
-    const applyTheme = (isDark: boolean) => {
-      setResolvedTheme(isDark ? 'dark' : 'light');
-      if (isDark) {
+    const applyTheme = (targetTheme: 'light' | 'dark' | 'black') => {
+      setResolvedTheme(targetTheme);
+      root.setAttribute('data-theme', targetTheme);
+      if (targetTheme === 'dark' || targetTheme === 'black') {
         root.classList.add('dark');
       } else {
         root.classList.remove('dark');
@@ -48,17 +50,18 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     };
 
     if (theme === 'system') {
-      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-      applyTheme(mediaQuery.matches);
+      const mediaQuery = window.matchMedia?.('(prefers-color-scheme: dark)');
+      const isSystemDark = mediaQuery?.matches ?? false;
+      applyTheme(isSystemDark ? 'dark' : 'light');
 
       const handleChange = (e: MediaQueryListEvent) => {
-        applyTheme(e.matches);
+        applyTheme(e.matches ? 'dark' : 'light');
       };
 
-      mediaQuery.addEventListener('change', handleChange);
-      return () => mediaQuery.removeEventListener('change', handleChange);
+      mediaQuery?.addEventListener?.('change', handleChange);
+      return () => mediaQuery?.removeEventListener?.('change', handleChange);
     } else {
-      applyTheme(theme === 'dark');
+      applyTheme(theme);
     }
   }, [theme]);
 
@@ -72,7 +75,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   };
 
   const toggleTheme = () => {
-    setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
+    setTheme(resolvedTheme === 'light' ? 'dark' : 'light');
   };
 
   return (
@@ -96,19 +99,20 @@ export function useTheme(): ThemeContextType {
 
 export function ThemeToggle({ className = '' }: { className?: string }) {
   const { resolvedTheme, toggleTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark' || resolvedTheme === 'black';
 
   return (
     <button
       type="button"
       onClick={toggleTheme}
-      title={resolvedTheme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-      aria-label={resolvedTheme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-      className={`p-1.5 rounded-lg text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 active:scale-95 motion-reduce:transform-none transition-all duration-75 cursor-pointer flex items-center justify-center ${className}`}
+      title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+      aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+      className={`btn btn-ghost btn-sm btn-square ${className}`}
     >
-      {resolvedTheme === 'dark' ? (
-        <Sun className="w-4 h-4 text-amber-400 transition-transform duration-200 rotate-0 hover:rotate-45" />
+      {isDark ? (
+        <Sun className="w-4 h-4 text-warning transition-transform duration-200 rotate-0 hover:rotate-45" />
       ) : (
-        <Moon className="w-4 h-4 text-slate-600 transition-transform duration-200 -rotate-12 hover:rotate-0" />
+        <Moon className="w-4 h-4 text-base-content transition-transform duration-200 -rotate-12 hover:rotate-0" />
       )}
     </button>
   );

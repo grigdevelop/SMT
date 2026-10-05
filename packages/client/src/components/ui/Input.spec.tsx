@@ -9,8 +9,8 @@ describe('Input Primitive', () => {
     render(<Input placeholder="Type something..." onChange={onChange} />);
     const input = screen.getByPlaceholderText('Type something...');
     expect(input).toBeDefined();
-    expect(input.className).toContain('border-border');
-    expect(input.className).toContain('bg-card');
+    expect(input.className).toContain('input');
+    expect(input.className).toContain('input-bordered');
 
     fireEvent.change(input, { target: { value: 'Test value' } });
     expect(onChange).toHaveBeenCalled();

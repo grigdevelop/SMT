@@ -20,8 +20,9 @@ describe('Card Primitives', () => {
     );
 
     const card = screen.getByTestId('test-card');
-    expect(card.className).toContain('bg-card');
-    expect(card.className).toContain('border-border');
+    expect(card.className).toContain('card');
+    expect(card.className).toContain('bg-base-100');
+    expect(card.className).toContain('border-base-300');
 
     expect(screen.getByText('Card Title')).toBeDefined();
     expect(screen.getByText('Card Description')).toBeDefined();

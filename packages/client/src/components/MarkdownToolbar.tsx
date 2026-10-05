@@ -36,7 +36,7 @@ export function MarkdownToolbar({
   };
 
   return (
-    <div className="flex items-center justify-between gap-2 pb-1.5 border-b border-border text-xs">
+    <div className="flex items-center justify-between gap-2 pb-1.5 border-b border-base-300 text-xs">
       {/* Left: Quick Formatting Buttons (horizontally scrollable on narrow mobile screens) */}
       <div className="flex items-center gap-0.5 overflow-x-auto py-0.5">
         <button
@@ -44,7 +44,7 @@ export function MarkdownToolbar({
           onClick={() => applyFormat('**', '**', 'bold text')}
           title="Bold (**text**)"
           disabled={mode === 'preview'}
-          className="p-1 rounded hover:bg-muted disabled:opacity-30 text-muted-foreground hover:text-foreground transition cursor-pointer shrink-0"
+          className="p-1 rounded hover:bg-base-200 disabled:opacity-30 text-base-content/70 hover:text-base-content transition cursor-pointer shrink-0"
         >
           <Bold className="w-3.5 h-3.5" />
         </button>
@@ -53,7 +53,7 @@ export function MarkdownToolbar({
           onClick={() => applyFormat('*', '*', 'italic text')}
           title="Italic (*text*)"
           disabled={mode === 'preview'}
-          className="p-1 rounded hover:bg-muted disabled:opacity-30 text-muted-foreground hover:text-foreground transition cursor-pointer shrink-0"
+          className="p-1 rounded hover:bg-base-200 disabled:opacity-30 text-base-content/70 hover:text-base-content transition cursor-pointer shrink-0"
         >
           <Italic className="w-3.5 h-3.5" />
         </button>
@@ -62,7 +62,7 @@ export function MarkdownToolbar({
           onClick={() => applyFormat('- ', '', 'list item')}
           title="Bullet List (- item)"
           disabled={mode === 'preview'}
-          className="p-1 rounded hover:bg-muted disabled:opacity-30 text-muted-foreground hover:text-foreground transition cursor-pointer shrink-0"
+          className="p-1 rounded hover:bg-base-200 disabled:opacity-30 text-base-content/70 hover:text-base-content transition cursor-pointer shrink-0"
         >
           <List className="w-3.5 h-3.5" />
         </button>
@@ -71,7 +71,7 @@ export function MarkdownToolbar({
           onClick={() => applyFormat('`', '`', 'code')}
           title="Inline Code (`code`)"
           disabled={mode === 'preview'}
-          className="p-1 rounded hover:bg-muted disabled:opacity-30 text-muted-foreground hover:text-foreground transition cursor-pointer shrink-0"
+          className="p-1 rounded hover:bg-base-200 disabled:opacity-30 text-base-content/70 hover:text-base-content transition cursor-pointer shrink-0"
         >
           <Code className="w-3.5 h-3.5" />
         </button>
@@ -80,21 +80,21 @@ export function MarkdownToolbar({
           onClick={() => applyFormat('[', '](https://)', 'link title')}
           title="Link ([title](url))"
           disabled={mode === 'preview'}
-          className="p-1 rounded hover:bg-muted disabled:opacity-30 text-muted-foreground hover:text-foreground transition cursor-pointer shrink-0"
+          className="p-1 rounded hover:bg-base-200 disabled:opacity-30 text-base-content/70 hover:text-base-content transition cursor-pointer shrink-0"
         >
           <LinkIcon className="w-3.5 h-3.5" />
         </button>
       </div>
 
       {/* Right: Write / Preview Tab Switch */}
-      <div className="flex items-center bg-muted rounded p-0.5 text-2xs font-medium shrink-0">
+      <div className="flex items-center bg-base-200 rounded p-0.5 text-2xs font-medium shrink-0">
         <button
           type="button"
           onClick={() => onModeChange('write')}
           className={`flex items-center gap-1 px-2 py-0.5 rounded transition cursor-pointer ${
             mode === 'write'
-              ? 'bg-card text-primary shadow-2xs font-semibold'
-              : 'text-muted-foreground hover:text-foreground'
+              ? 'bg-base-100 text-primary shadow-xs font-semibold'
+              : 'text-base-content/70 hover:text-base-content'
           }`}
         >
           <Edit3 className="w-3 h-3" />
@@ -105,8 +105,8 @@ export function MarkdownToolbar({
           onClick={() => onModeChange('preview')}
           className={`flex items-center gap-1 px-2 py-0.5 rounded transition cursor-pointer ${
             mode === 'preview'
-              ? 'bg-card text-primary shadow-2xs font-semibold'
-              : 'text-muted-foreground hover:text-foreground'
+              ? 'bg-base-100 text-primary shadow-xs font-semibold'
+              : 'text-base-content/70 hover:text-base-content'
           }`}
         >
           <Eye className="w-3 h-3" />

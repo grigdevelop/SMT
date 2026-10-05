@@ -90,7 +90,7 @@ export function TaskEditForm({
     <form
       onSubmit={handleSubmit}
       onKeyDown={handleKeyDown}
-      className="p-3.5 rounded-lg border border-primary/40 bg-card ring-2 ring-primary/10 shadow-xs space-y-3 transition-all"
+      className="card bg-base-100 p-3.5 border border-primary/40 shadow-sm space-y-3 transition-all"
     >
       {/* Title Input */}
       <div>
@@ -107,18 +107,18 @@ export function TaskEditForm({
           className="font-medium"
         />
         {isTitleEmpty && (
-          <p className="text-2xs text-destructive mt-1 font-medium">Title cannot be empty</p>
+          <p className="text-2xs text-error mt-1 font-medium">Title cannot be empty</p>
         )}
       </div>
 
       {/* Formatted Description Editor */}
-      <div className="rounded-md border border-border bg-muted/30 p-2.5 space-y-2">
-        <div className="flex items-center justify-between text-2xs font-medium text-muted-foreground">
+      <div className="rounded-lg border border-base-300 bg-base-200/40 p-2.5 space-y-2">
+        <div className="flex items-center justify-between text-2xs font-medium text-base-content/70">
           <span className="flex items-center gap-1">
             <FileText className="w-3.5 h-3.5 text-primary" />
             Description (Markdown notes, checklists, code):
           </span>
-          <span className="text-muted-foreground">{description.length}/5000</span>
+          <span className="text-base-content/50">{description.length}/5000</span>
         </div>
 
         <MarkdownToolbar
@@ -137,14 +137,14 @@ export function TaskEditForm({
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Add detailed notes, checklists (- item), or links ([text](url))..."
             maxLength={5000}
-            className="w-full p-2 rounded border border-border bg-card text-base sm:text-xs text-foreground placeholder-muted-foreground font-mono focus:outline-hidden focus:ring-1 focus:ring-primary focus:border-transparent resize-y"
+            className="textarea textarea-bordered w-full p-2.5 bg-base-100 text-base-content font-mono text-xs focus:textarea-primary resize-y"
           />
         ) : (
-          <div className="min-h-[72px] p-2.5 rounded border border-border bg-card">
+          <div className="min-h-[72px] p-2.5 rounded-lg border border-base-300 bg-base-100">
             {description.trim() ? (
               <MarkdownViewer content={description} />
             ) : (
-              <p className="text-xs text-muted-foreground italic">
+              <p className="text-xs text-base-content/50 italic">
                 No description content to preview.
               </p>
             )}
@@ -154,12 +154,12 @@ export function TaskEditForm({
 
       {/* Single-Task Date Controls (Hidden when Repeating) */}
       {!recurrenceRule && (
-        <div className="pt-2 border-t border-border flex flex-col sm:flex-row sm:flex-wrap gap-2.5 sm:gap-4 text-xs">
+        <div className="pt-2 border-t border-base-300 flex flex-col sm:flex-row sm:flex-wrap gap-2.5 sm:gap-4 text-xs">
           {/* Todo Date (Execution Day) */}
           <div className="flex flex-col gap-1">
             <label
               htmlFor={`edit-todo-date-${task.id}`}
-              className="text-muted-foreground font-medium flex items-center gap-1 text-2xs"
+              className="text-base-content/70 font-medium flex items-center gap-1 text-2xs"
             >
               <CalendarDays className="w-3.5 h-3.5 text-primary" />
               <span>Todo Date (Execution):</span>
@@ -170,27 +170,23 @@ export function TaskEditForm({
                 type="date"
                 value={todoDate}
                 onChange={(e) => setTodoDate(e.target.value)}
-                className="px-2 py-1 rounded border border-border bg-card font-mono text-foreground text-base sm:text-xs shadow-2xs focus:ring-1 focus:ring-primary focus:outline-hidden"
+                className="input input-bordered input-sm font-mono text-base-content"
               />
               <button
                 type="button"
                 onClick={() => setTodoDate(currentDate)}
-                className="text-2xs px-1.5 py-1 rounded bg-secondary hover:bg-secondary/80 text-secondary-foreground font-medium cursor-pointer"
+                className="btn btn-ghost btn-xs"
               >
                 Today
               </button>
-              <button
-                type="button"
-                onClick={handleTomorrow}
-                className="text-2xs px-1.5 py-1 rounded bg-secondary hover:bg-secondary/80 text-secondary-foreground font-medium cursor-pointer"
-              >
+              <button type="button" onClick={handleTomorrow} className="btn btn-ghost btn-xs">
                 +1d
               </button>
               {todoDate && (
                 <button
                   type="button"
                   onClick={() => setTodoDate('')}
-                  className="text-2xs px-1.5 py-1 rounded hover:bg-destructive/10 text-destructive font-medium cursor-pointer"
+                  className="btn btn-ghost btn-xs text-error hover:bg-error/10"
                   title="Clear todo date"
                 >
                   Clear
@@ -203,9 +199,9 @@ export function TaskEditForm({
           <div className="flex flex-col gap-1">
             <label
               htmlFor={`edit-deadline-${task.id}`}
-              className="text-muted-foreground font-medium flex items-center gap-1 text-2xs"
+              className="text-base-content/70 font-medium flex items-center gap-1 text-2xs"
             >
-              <Clock className="w-3.5 h-3.5 text-destructive" />
+              <Clock className="w-3.5 h-3.5 text-error" />
               <span>Deadline (Cutoff):</span>
             </label>
             <div className="flex items-center gap-1.5">
@@ -214,13 +210,13 @@ export function TaskEditForm({
                 type="date"
                 value={deadline}
                 onChange={(e) => setDeadline(e.target.value)}
-                className="px-2 py-1 rounded border border-border bg-card font-mono text-foreground text-base sm:text-xs shadow-2xs focus:ring-1 focus:ring-destructive focus:outline-hidden"
+                className="input input-bordered input-sm font-mono text-base-content"
               />
               {deadline && (
                 <button
                   type="button"
                   onClick={() => setDeadline('')}
-                  className="text-2xs px-1.5 py-1 rounded hover:bg-destructive/10 text-destructive font-medium cursor-pointer"
+                  className="btn btn-ghost btn-xs text-error hover:bg-error/10"
                   title="Clear deadline"
                 >
                   Clear
@@ -242,7 +238,7 @@ export function TaskEditForm({
       <SkillSelector selectedSkillIds={skillIds} onChange={setSkillIds} />
 
       {/* Action Buttons */}
-      <div className="pt-2 border-t border-border flex items-center justify-end gap-2">
+      <div className="pt-2 border-t border-base-300 flex items-center justify-end gap-2">
         <Button type="button" variant="outline" size="sm" onClick={onCancel} disabled={isSaving}>
           <X className="w-3.5 h-3.5 mr-1" />
           Cancel

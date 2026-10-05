@@ -134,8 +134,8 @@ export function SkillsPage() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center py-20 text-slate-400">
-        <Loader2 className="w-6 h-6 animate-spin mr-2" />
+      <div className="flex justify-center items-center py-20 text-base-content/60">
+        <Loader2 className="w-6 h-6 animate-spin mr-2 text-primary" />
         <span>Loading skills...</span>
       </div>
     );
@@ -143,7 +143,7 @@ export function SkillsPage() {
 
   if (error) {
     return (
-      <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm max-w-xl mx-auto">
+      <div className="p-4 bg-error/10 border border-error/20 text-error rounded-lg text-sm max-w-xl mx-auto">
         Failed to load skills.
       </div>
     );
@@ -152,30 +152,30 @@ export function SkillsPage() {
   return (
     <div ref={pageRef} className="w-full max-w-4xl mx-auto space-y-6">
       {/* Header and Summary Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-border">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-base-300">
         <div>
-          <h2 className="text-xl font-bold text-foreground tracking-tight flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+          <h2 className="text-xl font-bold text-base-content tracking-tight flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-primary" />
             Skills & Capability Progression
           </h2>
-          <p className="text-xs text-muted-foreground mt-1">
+          <p className="text-xs text-base-content/70 mt-1">
             Zero-drift mastery: tasks complete into capability investment without RPG clutter.
           </p>
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-3 text-xs text-muted-foreground bg-card border border-border px-3 py-1.5 rounded-lg shadow-2xs">
+          <div className="flex items-center gap-3 text-xs text-base-content/70 bg-base-100 border border-base-300 px-3 py-1.5 rounded-lg shadow-xs">
             <div className="flex items-center gap-1.5">
-              <Layers className="w-3.5 h-3.5 text-muted-foreground" />
+              <Layers className="w-3.5 h-3.5 text-base-content/60" />
               <span>
-                <strong className="text-foreground">{skills.length}</strong> Skills
+                <strong className="text-base-content">{skills.length}</strong> Skills
               </span>
             </div>
-            <div className="h-3 w-px bg-border" />
+            <div className="h-3 w-px bg-base-300" />
             <div className="flex items-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+              <CheckCircle2 className="w-3.5 h-3.5 text-success" />
               <span>
-                <strong className="text-foreground">{totalMastery}</strong> Completed
+                <strong className="text-base-content">{totalMastery}</strong> Completed
               </span>
             </div>
           </div>
@@ -193,18 +193,18 @@ export function SkillsPage() {
       {isCreating && (
         <form
           onSubmit={handleCreateSubmit}
-          className="p-4 rounded-xl border border-indigo-200 dark:border-indigo-800 bg-card shadow-sm space-y-3"
+          className="card bg-base-100 p-4 border border-primary/30 shadow-sm space-y-3"
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
-              <Plus className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+            <span className="text-xs font-semibold text-base-content flex items-center gap-1.5">
+              <Plus className="w-3.5 h-3.5 text-primary" />
               Create New Skill
             </span>
             <Button
               variant="ghost"
               size="iconSm"
               onClick={handleCancelCreate}
-              className="text-muted-foreground hover:text-foreground"
+              className="text-base-content/60 hover:text-base-content"
             >
               <X className="w-4 h-4" />
             </Button>
@@ -229,7 +229,7 @@ export function SkillsPage() {
                   onClick={() => setNewSkillColor(color)}
                   className={`w-6 h-6 rounded-full transition-transform active:scale-90 motion-reduce:transform-none cursor-pointer shrink-0 ${
                     newSkillColor === color
-                      ? 'ring-2 ring-offset-2 ring-indigo-500 dark:ring-offset-slate-900 scale-110'
+                      ? 'ring-2 ring-offset-2 ring-primary scale-110'
                       : 'hover:opacity-80'
                   }`}
                   style={{ backgroundColor: color }}
@@ -239,9 +239,7 @@ export function SkillsPage() {
             </div>
           </div>
 
-          {createError && (
-            <p className="text-2xs text-rose-600 dark:text-rose-400 font-medium">{createError}</p>
-          )}
+          {createError && <p className="text-2xs text-error font-medium">{createError}</p>}
 
           <div className="flex justify-end gap-2 pt-1">
             <Button variant="outline" size="sm" onClick={handleCancelCreate}>
@@ -262,10 +260,10 @@ export function SkillsPage() {
 
       {/* Skills Grid */}
       {skills.length === 0 && !isCreating ? (
-        <div className="text-center py-16 border-2 border-dashed border-border rounded-xl space-y-3 bg-card/50">
-          <Award className="w-10 h-10 text-muted-foreground mx-auto" />
-          <div className="text-sm font-medium text-foreground">No skills cultivated yet</div>
-          <p className="text-xs text-muted-foreground max-w-sm mx-auto">
+        <div className="text-center py-16 border-2 border-dashed border-base-300 rounded-xl space-y-3 bg-base-100/50">
+          <Award className="w-10 h-10 text-base-content/40 mx-auto" />
+          <div className="text-sm font-medium text-base-content">No skills cultivated yet</div>
+          <p className="text-xs text-base-content/70 max-w-sm mx-auto">
             Skills transform your daily checklists into long-term capability growth. Add your first
             skill to start tracking progress.
           </p>
@@ -285,16 +283,16 @@ export function SkillsPage() {
                 <form
                   key={skill.id}
                   onSubmit={(e) => handleEditSubmit(skill.id, e)}
-                  className="p-4 rounded-xl border border-primary/30 bg-card shadow-xs space-y-3"
+                  className="card bg-base-100 p-4 border border-primary/30 shadow-xs space-y-3"
                 >
-                  <div className="flex items-center justify-between text-xs font-semibold text-foreground">
+                  <div className="flex items-center justify-between text-xs font-semibold text-base-content">
                     <span>Edit Skill</span>
                     <Button
                       type="button"
                       variant="ghost"
                       size="iconSm"
                       onClick={handleCancelEdit}
-                      className="text-muted-foreground hover:text-foreground"
+                      className="text-base-content/60 hover:text-base-content"
                     >
                       <X className="w-4 h-4" />
                     </Button>
@@ -325,9 +323,7 @@ export function SkillsPage() {
                     ))}
                   </div>
 
-                  {editError && (
-                    <p className="text-2xs text-destructive font-medium">{editError}</p>
-                  )}
+                  {editError && <p className="text-2xs text-error font-medium">{editError}</p>}
 
                   <div className="flex justify-end gap-2 pt-1">
                     <Button type="button" variant="outline" size="sm" onClick={handleCancelEdit}>
@@ -349,7 +345,7 @@ export function SkillsPage() {
               <div
                 key={skill.id}
                 data-testid={`skill-card-${skill.name.toLowerCase()}`}
-                className="p-4 rounded-xl border border-border bg-card hover:border-border/80 shadow-2xs transition space-y-3 group"
+                className="card bg-base-100 p-4 border border-base-300 hover:border-base-content/30 shadow-xs transition space-y-3 group"
               >
                 {/* Card Top: Skill Name & Action Buttons */}
                 <div className="flex items-center justify-between">
@@ -358,7 +354,9 @@ export function SkillsPage() {
                       className="w-3 h-3 rounded-full shrink-0"
                       style={{ backgroundColor: skill.color }}
                     />
-                    <h3 className="text-sm font-semibold text-foreground truncate">{skill.name}</h3>
+                    <h3 className="text-sm font-semibold text-base-content truncate">
+                      {skill.name}
+                    </h3>
                   </div>
 
                   <div className="flex items-center gap-1">
@@ -374,7 +372,7 @@ export function SkillsPage() {
                       size="iconSm"
                       onClick={() => handleStartEdit(skill)}
                       aria-label={`Edit ${skill.name}`}
-                      className="text-muted-foreground hover:text-foreground sm:opacity-0 sm:group-hover:opacity-100 focus:opacity-100"
+                      className="text-base-content/60 hover:text-primary sm:opacity-0 sm:group-hover:opacity-100 focus:opacity-100"
                     >
                       <Pencil className="w-3.5 h-3.5" />
                     </Button>
@@ -384,7 +382,7 @@ export function SkillsPage() {
                       size="iconSm"
                       onClick={() => handleDelete(skill.id, skill.name)}
                       aria-label={`Delete ${skill.name}`}
-                      className="text-muted-foreground hover:text-destructive sm:opacity-0 sm:group-hover:opacity-100 focus:opacity-100"
+                      className="text-base-content/60 hover:text-error sm:opacity-0 sm:group-hover:opacity-100 focus:opacity-100"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </Button>
@@ -393,17 +391,17 @@ export function SkillsPage() {
 
                 {/* Card Middle: Completed Tasks Counter */}
                 <div className="flex items-baseline gap-1.5">
-                  <span className="text-2xl font-bold text-foreground">
+                  <span className="text-2xl font-bold text-base-content">
                     {skill.completedTaskCount}
                   </span>
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-xs text-base-content/70">
                     {skill.completedTaskCount === 1 ? 'task completed' : 'tasks completed'}
                   </span>
                 </div>
 
                 {/* Card Bottom: Tier Progress Bar */}
                 <div className="space-y-1">
-                  <div className="flex justify-between items-center text-2xs text-muted-foreground">
+                  <div className="flex justify-between items-center text-2xs text-base-content/70">
                     <span>
                       {tierProgress.nextTierAt
                         ? `${tierProgress.nextTierAt - skill.completedTaskCount} more to next tier`
@@ -412,7 +410,7 @@ export function SkillsPage() {
                     <span>{Math.round(tierProgress.progress * 100)}%</span>
                   </div>
 
-                  <div className="w-full h-1.5 rounded-full bg-muted overflow-hidden">
+                  <div className="w-full h-1.5 rounded-full bg-base-200 overflow-hidden">
                     <div
                       className="h-full rounded-full transition-all duration-500"
                       style={{

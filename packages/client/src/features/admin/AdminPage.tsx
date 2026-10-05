@@ -55,13 +55,13 @@ export function AdminPage() {
   return (
     <div className="space-y-6">
       {/* Page Title & Context */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-border pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-base-300 pb-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight flex items-center gap-2">
+          <h1 className="text-xl sm:text-2xl font-bold text-base-content tracking-tight flex items-center gap-2">
             <Shield className="w-6 h-6 text-primary" />
             <span>Administration</span>
           </h1>
-          <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
+          <p className="text-xs sm:text-sm text-base-content/70 mt-0.5">
             Manage registered user accounts, role-based access permissions, and system access.
           </p>
         </div>
@@ -71,9 +71,9 @@ export function AdminPage() {
       {successMessage && (
         <div
           role="status"
-          className="p-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 rounded-lg text-xs flex items-center gap-2 animate-in fade-in duration-200"
+          className="p-3 bg-success/10 border border-success/20 text-success rounded-lg text-xs flex items-center gap-2 animate-in fade-in duration-200"
         >
-          <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+          <CheckCircle2 className="w-4 h-4 text-success shrink-0" />
           <span>{successMessage}</span>
         </div>
       )}
@@ -82,9 +82,9 @@ export function AdminPage() {
       {(error || updateRoleMutation.isError || deleteUserMutation.isError) && (
         <div
           role="alert"
-          className="p-3 bg-destructive/10 border border-destructive/20 text-destructive rounded-lg text-xs flex items-center gap-2"
+          className="p-3 bg-error/10 border border-error/20 text-error rounded-lg text-xs flex items-center gap-2"
         >
-          <AlertTriangle className="w-4 h-4 text-destructive shrink-0" />
+          <AlertTriangle className="w-4 h-4 text-error shrink-0" />
           <span>
             {error instanceof Error
               ? error.message
@@ -99,63 +99,63 @@ export function AdminPage() {
 
       {/* Metric Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <div className="bg-card p-3.5 rounded-xl border border-border shadow-2xs flex items-center gap-3">
+        <div className="card bg-base-100 p-3.5 border border-base-300 shadow-xs flex flex-row items-center gap-3">
           <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
             <Users className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-2xs font-medium text-muted-foreground uppercase tracking-wider">
+            <div className="text-2xs font-medium text-base-content/60 uppercase tracking-wider">
               Total Accounts
             </div>
-            <div className="text-lg font-bold text-foreground">{totalUsers}</div>
+            <div className="text-lg font-bold text-base-content">{totalUsers}</div>
           </div>
         </div>
 
-        <div className="bg-card p-3.5 rounded-xl border border-border shadow-2xs flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
+        <div className="card bg-base-100 p-3.5 border border-base-300 shadow-xs flex flex-row items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-secondary/15 text-secondary flex items-center justify-center shrink-0">
             <Shield className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-2xs font-medium text-muted-foreground uppercase tracking-wider">
+            <div className="text-2xs font-medium text-base-content/60 uppercase tracking-wider">
               Administrators
             </div>
-            <div className="text-lg font-bold text-foreground">{adminCount}</div>
+            <div className="text-lg font-bold text-base-content">{adminCount}</div>
           </div>
         </div>
 
-        <div className="bg-card p-3.5 rounded-xl border border-border shadow-2xs flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-muted text-muted-foreground flex items-center justify-center shrink-0">
+        <div className="card bg-base-100 p-3.5 border border-base-300 shadow-xs flex flex-row items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-base-200 text-base-content/70 flex items-center justify-center shrink-0">
             <UserIcon className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-2xs font-medium text-muted-foreground uppercase tracking-wider">
+            <div className="text-2xs font-medium text-base-content/60 uppercase tracking-wider">
               Standard Users
             </div>
-            <div className="text-lg font-bold text-foreground">{standardCount}</div>
+            <div className="text-lg font-bold text-base-content">{standardCount}</div>
           </div>
         </div>
       </div>
 
       {/* Users Container */}
-      <div className="bg-card rounded-xl border border-border shadow-2xs overflow-hidden">
-        <div className="px-4 py-3 border-b border-border bg-muted/40 flex items-center justify-between">
-          <h2 className="text-xs sm:text-sm font-semibold text-foreground">User Accounts</h2>
-          <span className="text-2xs text-muted-foreground">{totalUsers} registered</span>
+      <div className="card bg-base-100 border border-base-300 shadow-xs overflow-hidden">
+        <div className="px-4 py-3 border-b border-base-300 bg-base-200/40 flex items-center justify-between">
+          <h2 className="text-xs sm:text-sm font-semibold text-base-content">User Accounts</h2>
+          <span className="text-2xs text-base-content/60">{totalUsers} registered</span>
         </div>
 
         {isLoading ? (
-          <div className="p-8 text-center text-slate-400 flex flex-col items-center justify-center gap-2">
-            <Loader2 className="w-6 h-6 animate-spin text-indigo-600" />
+          <div className="p-8 text-center text-base-content/60 flex flex-col items-center justify-center gap-2">
+            <Loader2 className="w-6 h-6 animate-spin text-primary" />
             <p className="text-xs">Loading user accounts...</p>
           </div>
         ) : users.length === 0 ? (
-          <div className="p-8 text-center text-slate-400 text-xs">No users found.</div>
+          <div className="p-8 text-center text-base-content/60 text-xs">No users found.</div>
         ) : (
           <>
             {/* Desktop Table View (Hidden on mobile < sm) */}
             <div className="hidden sm:block overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead className="bg-muted/30 text-muted-foreground border-b border-border text-2xs uppercase tracking-wider font-semibold">
+              <table className="table w-full text-left text-xs">
+                <thead className="bg-base-200/50 text-base-content/70 border-b border-base-300 text-2xs uppercase tracking-wider font-semibold">
                   <tr>
                     <th scope="col" className="px-4 py-2.5">
                       User Email
@@ -174,17 +174,17 @@ export function AdminPage() {
                     </th>
                   </tr>
                 </thead>
-                <tbody ref={tableBodyRef} className="divide-y divide-border">
+                <tbody ref={tableBodyRef} className="divide-y divide-base-300">
                   {users.map((u) => {
                     const isSelf = u.id === currentUser?.id;
                     const isConfirmingDelete = confirmDeleteId === u.id;
 
                     return (
-                      <tr key={u.id} className="hover:bg-muted/40 transition">
+                      <tr key={u.id} className="hover:bg-base-200/50 transition">
                         {/* Email & (You) pill */}
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-2">
-                            <span className="font-medium text-foreground">{u.email}</span>
+                            <span className="font-medium text-base-content">{u.email}</span>
                             {isSelf && <Badge variant="primary">You</Badge>}
                           </div>
                         </td>
@@ -202,7 +202,7 @@ export function AdminPage() {
                               value={u.role}
                               disabled={updateRoleMutation.isPending}
                               onChange={(e) => handleRoleChange(u.id, e.target.value as Role)}
-                              className="px-2 py-1 text-xs rounded border border-border bg-card text-foreground shadow-2xs focus:ring-1 focus:ring-primary focus:outline-hidden cursor-pointer"
+                              className="select select-bordered select-xs text-xs font-normal cursor-pointer"
                             >
                               <option value={Role.USER}>USER</option>
                               <option value={Role.ADMIN}>ADMIN</option>
@@ -211,19 +211,19 @@ export function AdminPage() {
                         </td>
 
                         {/* Activity */}
-                        <td className="px-4 py-3 text-muted-foreground">
+                        <td className="px-4 py-3 text-base-content/70">
                           <div className="flex items-center gap-2 text-2xs">
-                            <span className="bg-muted px-2 py-0.5 rounded text-muted-foreground">
+                            <span className="badge badge-ghost badge-sm text-2xs">
                               {u.taskCount} tasks
                             </span>
-                            <span className="bg-muted px-2 py-0.5 rounded text-muted-foreground">
+                            <span className="badge badge-ghost badge-sm text-2xs">
                               {u.skillCount} skills
                             </span>
                           </div>
                         </td>
 
                         {/* Joined Date */}
-                        <td className="px-4 py-3 text-muted-foreground text-2xs">
+                        <td className="px-4 py-3 text-base-content/70 text-2xs">
                           {new Date(u.createdAt).toLocaleDateString()}
                         </td>
 
@@ -231,14 +231,14 @@ export function AdminPage() {
                         <td className="px-4 py-3 text-right">
                           {isSelf ? (
                             <span
-                              className="text-2xs text-muted-foreground italic"
+                              className="text-2xs text-base-content/50 italic"
                               title="You cannot delete your own active admin account"
                             >
                               Current session
                             </span>
                           ) : isConfirmingDelete ? (
                             <div className="inline-flex items-center gap-1.5">
-                              <span className="text-2xs text-destructive font-medium">Delete?</span>
+                              <span className="text-2xs text-error font-medium">Delete?</span>
                               <Button
                                 type="button"
                                 variant="danger"
@@ -267,7 +267,7 @@ export function AdminPage() {
                               onClick={() => setConfirmDeleteId(u.id)}
                               title={`Delete ${u.email}`}
                               aria-label={`Delete user ${u.email}`}
-                              className="text-muted-foreground hover:text-destructive"
+                              className="text-base-content/60 hover:text-error"
                             >
                               <Trash2 className="w-4 h-4" />
                             </Button>
@@ -281,7 +281,7 @@ export function AdminPage() {
             </div>
 
             {/* Mobile Card View (Hidden on sm+) */}
-            <div ref={mobileCardsRef} className="sm:hidden divide-y divide-border">
+            <div ref={mobileCardsRef} className="sm:hidden divide-y divide-base-300">
               {users.map((u) => {
                 const isSelf = u.id === currentUser?.id;
                 const isConfirmingDelete = confirmDeleteId === u.id;
@@ -291,12 +291,12 @@ export function AdminPage() {
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
                         <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className="font-semibold text-foreground text-xs truncate">
+                          <span className="font-semibold text-base-content text-xs truncate">
                             {u.email}
                           </span>
                           {isSelf && <Badge variant="primary">You</Badge>}
                         </div>
-                        <div className="text-2xs text-muted-foreground mt-0.5">
+                        <div className="text-2xs text-base-content/60 mt-0.5">
                           Joined {new Date(u.createdAt).toLocaleDateString()}
                         </div>
                       </div>
@@ -313,7 +313,7 @@ export function AdminPage() {
                           value={u.role}
                           disabled={updateRoleMutation.isPending}
                           onChange={(e) => handleRoleChange(u.id, e.target.value as Role)}
-                          className="px-2 py-1 text-base sm:text-xs rounded border border-border bg-card text-foreground shadow-2xs shrink-0 cursor-pointer"
+                          className="select select-bordered select-xs text-xs font-normal shrink-0 cursor-pointer"
                         >
                           <option value={Role.USER}>USER</option>
                           <option value={Role.ADMIN}>ADMIN</option>
@@ -321,12 +321,12 @@ export function AdminPage() {
                       )}
                     </div>
 
-                    <div className="flex items-center justify-between text-2xs text-muted-foreground pt-1 border-t border-border">
+                    <div className="flex items-center justify-between text-2xs text-base-content/70 pt-1 border-t border-base-300">
                       <div className="flex items-center gap-2">
-                        <span className="bg-muted px-2 py-0.5 rounded text-muted-foreground">
+                        <span className="badge badge-ghost badge-sm text-2xs">
                           {u.taskCount} tasks
                         </span>
-                        <span className="bg-muted px-2 py-0.5 rounded text-muted-foreground">
+                        <span className="badge badge-ghost badge-sm text-2xs">
                           {u.skillCount} skills
                         </span>
                       </div>
@@ -361,7 +361,7 @@ export function AdminPage() {
                               type="button"
                               onClick={() => setConfirmDeleteId(u.id)}
                               aria-label={`Delete user ${u.email}`}
-                              className="text-destructive font-medium hover:underline p-1 cursor-pointer"
+                              className="text-error font-medium hover:underline p-1 cursor-pointer"
                             >
                               Delete
                             </button>

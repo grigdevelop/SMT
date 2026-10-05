@@ -58,7 +58,7 @@ export function AuthPage({ mode }: AuthPageProps) {
   };
 
   return (
-    <div className="relative min-h-screen bg-background flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="relative min-h-screen bg-base-200 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       {/* Floating Theme Toggle */}
       <div className="absolute top-4 right-4">
         <ThemeToggle />
@@ -69,10 +69,10 @@ export function AuthPage({ mode }: AuthPageProps) {
         <div className="inline-flex items-center justify-center mb-4 shadow-sm rounded-xl">
           <BrandLogo size="lg" />
         </div>
-        <h1 className="text-2xl font-bold tracking-tight text-foreground">
+        <h1 className="text-2xl font-bold tracking-tight text-base-content">
           {isLogin ? 'Welcome back' : 'Create your account'}
         </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <p className="mt-1 text-sm text-base-content/70">
           {isLogin
             ? 'Sign in to access your daily tasks, habits, and goals'
             : 'Get started with zero-friction personal self-management'}
@@ -81,14 +81,14 @@ export function AuthPage({ mode }: AuthPageProps) {
 
       {/* Main Card */}
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-card py-8 px-4 sm:px-10 shadow-sm border border-border rounded-xl">
+        <div className="card bg-base-100 py-8 px-4 sm:px-10 shadow-sm border border-base-300 rounded-xl">
           {/* Server Error Alert Banner */}
           {serverError && (
             <div
               role="alert"
-              className="mb-6 p-3.5 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm flex items-start gap-2.5 animate-in fade-in duration-200"
+              className="mb-6 p-3.5 rounded-lg bg-error/10 border border-error/20 text-error text-sm flex items-start gap-2.5 animate-in fade-in duration-200"
             >
-              <AlertCircle className="w-5 h-5 text-destructive shrink-0 mt-0.5" />
+              <AlertCircle className="w-5 h-5 text-error shrink-0 mt-0.5" />
               <div className="flex-1 font-medium">{serverError}</div>
             </div>
           )}
@@ -98,7 +98,7 @@ export function AuthPage({ mode }: AuthPageProps) {
             <div>
               <label
                 htmlFor="email"
-                className="block text-xs font-semibold text-foreground uppercase tracking-wider mb-1.5"
+                className="block text-xs font-semibold text-base-content uppercase tracking-wider mb-1.5"
               >
                 Email address
               </label>
@@ -109,14 +109,12 @@ export function AuthPage({ mode }: AuthPageProps) {
                 placeholder="you@example.com"
                 {...formRegister('email')}
                 className={cn(
-                  'block w-full px-3.5 py-2.5 text-base sm:text-sm rounded-lg border transition shadow-xs outline-hidden focus:ring-2 bg-card text-foreground placeholder-muted-foreground',
-                  errors.email
-                    ? 'border-destructive focus:border-destructive focus:ring-destructive/20 text-destructive'
-                    : 'border-border focus:border-primary focus:ring-primary/20',
+                  'input input-bordered w-full text-base sm:text-sm',
+                  errors.email && 'input-error text-error',
                 )}
               />
               {errors.email && (
-                <p className="mt-1.5 text-xs text-destructive font-medium flex items-center gap-1">
+                <p className="mt-1.5 text-xs text-error font-medium flex items-center gap-1">
                   <span>•</span>
                   {errors.email.message}
                 </p>
@@ -128,12 +126,12 @@ export function AuthPage({ mode }: AuthPageProps) {
               <div className="flex items-center justify-between mb-1.5">
                 <label
                   htmlFor="password"
-                  className="block text-xs font-semibold text-foreground uppercase tracking-wider"
+                  className="block text-xs font-semibold text-base-content uppercase tracking-wider"
                 >
                   Password
                 </label>
                 {!isLogin && (
-                  <span className="text-2xs text-muted-foreground">Min. 8 characters</span>
+                  <span className="text-2xs text-base-content/60">Min. 8 characters</span>
                 )}
               </div>
               <div className="relative">
@@ -144,23 +142,21 @@ export function AuthPage({ mode }: AuthPageProps) {
                   placeholder="••••••••"
                   {...formRegister('password')}
                   className={cn(
-                    'block w-full px-3.5 py-2.5 pr-10 text-base sm:text-sm rounded-lg border transition shadow-xs outline-hidden focus:ring-2 bg-card text-foreground placeholder-muted-foreground',
-                    errors.password
-                      ? 'border-destructive focus:border-destructive focus:ring-destructive/20 text-destructive'
-                      : 'border-border focus:border-primary focus:ring-primary/20',
+                    'input input-bordered w-full pr-10 text-base sm:text-sm',
+                    errors.password && 'input-error text-error',
                   )}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground hover:text-foreground focus:outline-hidden"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-base-content/60 hover:text-base-content focus:outline-hidden"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
               {errors.password && (
-                <p className="mt-1.5 text-xs text-destructive font-medium flex items-center gap-1">
+                <p className="mt-1.5 text-xs text-error font-medium flex items-center gap-1">
                   <span>•</span>
                   {errors.password.message}
                 </p>
@@ -185,9 +181,9 @@ export function AuthPage({ mode }: AuthPageProps) {
           </form>
 
           {/* Toggle Login / Register */}
-          <div className="mt-6 pt-6 border-t border-border text-center">
+          <div className="mt-6 pt-6 border-t border-base-300 text-center">
             {isLogin ? (
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-base-content/70">
                 Don't have an account yet?{' '}
                 <Link
                   to="/register"
@@ -201,7 +197,7 @@ export function AuthPage({ mode }: AuthPageProps) {
                 </Link>
               </p>
             ) : (
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-base-content/70">
                 Already have an account?{' '}
                 <Link
                   to="/login"
